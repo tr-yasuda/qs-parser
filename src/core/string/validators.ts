@@ -213,15 +213,15 @@ export const validateUuid = (
 /**
  * Validate UUID v4 constraint
  * @param value - The string to validate
- * @param isUuidv4 - Whether to validate as UUID v4
+ * @param isUuidV4 - Whether to validate as UUID v4
  * @returns The validation result
  */
-export const validateUuidv4 = (
+export const validateUuidV4 = (
   value: string,
-  isUuidv4?: boolean,
+  isUuidV4?: boolean,
 ): StringParseResult => {
   if (
-    isUuidv4 &&
+    isUuidV4 &&
     !/^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/i.test(
       value,
     )
@@ -241,15 +241,15 @@ export const validateUuidv4 = (
 /**
  * Validate UUID v7 constraint
  * @param value - The string to validate
- * @param isUuidv7 - Whether to validate as UUID v7
+ * @param isUuidV7 - Whether to validate as UUID v7
  * @returns The validation result
  */
-export const validateUuidv7 = (
+export const validateUuidV7 = (
   value: string,
-  isUuidv7?: boolean,
+  isUuidV7?: boolean,
 ): StringParseResult => {
   if (
-    isUuidv7 &&
+    isUuidV7 &&
     !/^[\da-f]{8}-[\da-f]{4}-7[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/i.test(
       value,
     )

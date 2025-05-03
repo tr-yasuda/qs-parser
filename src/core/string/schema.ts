@@ -68,8 +68,8 @@ const string = (): StringSchema => {
           validators.validateUrl(stringValue, newConstraints.isUrl),
           validators.validateEmoji(stringValue, newConstraints.isEmoji),
           validators.validateUuid(stringValue, newConstraints.isUuid),
-          validators.validateUuidv4(stringValue, newConstraints.isUuidv4),
-          validators.validateUuidv7(stringValue, newConstraints.isUuidv7),
+          validators.validateUuidV4(stringValue, newConstraints.isUuidV4),
+          validators.validateUuidV7(stringValue, newConstraints.isUuidV7),
           validators.validateCuid(stringValue, newConstraints.isCuid),
           validators.validateCuid2(stringValue, newConstraints.isCuid2),
           validators.validateUlid(stringValue, newConstraints.isUlid),
@@ -172,21 +172,21 @@ const string = (): StringSchema => {
         );
       },
 
-      uuidv4: (): StringSchema => {
+      uuidV4: (): StringSchema => {
         return createSchemaWithConstraints(
           {
             ...newConstraints,
-            isUuidv4: true,
+            isUuidV4: true,
           },
           createStringSchema,
         );
       },
 
-      uuidv7: (): StringSchema => {
+      uuidV7: (): StringSchema => {
         return createSchemaWithConstraints(
           {
             ...newConstraints,
-            isUuidv7: true,
+            isUuidV7: true,
           },
           createStringSchema,
         );

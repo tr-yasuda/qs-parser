@@ -15,8 +15,8 @@ export type StringConstraints = {
   isUrl?: boolean;
   isEmoji?: boolean;
   isUuid?: boolean;
-  isUuidv4?: boolean;
-  isUuidv7?: boolean;
+  isUuidV4?: boolean;
+  isUuidV7?: boolean;
   isCuid?: boolean;
   isCuid2?: boolean;
   isUlid?: boolean;
@@ -83,8 +83,8 @@ export type StringSchema = {
   url: () => StringSchema;
   emoji: () => StringSchema;
   uuid: () => StringSchema;
-  uuidv4: () => StringSchema;
-  uuidv7: () => StringSchema;
+  uuidV4: () => StringSchema;
+  uuidV7: () => StringSchema;
   cuid: () => StringSchema;
   cuid2: () => StringSchema;
   ulid: () => StringSchema;
