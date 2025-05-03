@@ -3,6 +3,32 @@
  */
 
 /**
+ * Error codes for date validation
+ */
+export enum DateErrorCode {
+  TYPE = 'date.type',
+  MIN = 'date.min',
+  MAX = 'date.max',
+  PAST = 'date.past',
+  FUTURE = 'date.future',
+  BETWEEN = 'date.between',
+  TODAY = 'date.today',
+}
+
+/**
+ * Error messages for date validation
+ */
+export const DateErrorMessages = {
+  [DateErrorCode.TYPE]: 'Expected date',
+  [DateErrorCode.MIN]: 'Date must be at or after {0}',
+  [DateErrorCode.MAX]: 'Date must be at or before {0}',
+  [DateErrorCode.PAST]: 'Date must be in the past',
+  [DateErrorCode.FUTURE]: 'Date must be in the future',
+  [DateErrorCode.BETWEEN]: 'Date must be between {0} and {1}',
+  [DateErrorCode.TODAY]: 'Date must be today',
+};
+
+/**
  * Error codes for boolean validation
  */
 export enum BooleanErrorCode {
