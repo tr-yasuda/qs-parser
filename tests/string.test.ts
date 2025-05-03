@@ -139,7 +139,7 @@ describe('string schema', () => {
   });
 
   it('should validate uuid v4', () => {
-    const schema = q.string().uuidv4();
+    const schema = q.string().uuidV4();
 
     // Valid UUIDv4
     const result1 = schema.parse('123e4567-e89b-42d3-a456-426614174000');
@@ -163,7 +163,7 @@ describe('string schema', () => {
   });
 
   it('should validate uuid v7', () => {
-    const schema = q.string().uuidv7();
+    const schema = q.string().uuidV7();
 
     // Valid UUIDv7
     const result1 = schema.parse('123e4567-e89b-72d3-a456-426614174000');
