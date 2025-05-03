@@ -115,5 +115,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Run lint
+      - name: Run type check
         run: pnpm type-check
