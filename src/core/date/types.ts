@@ -1,7 +1,7 @@
 /**
  * Type definitions for date schema
  */
-import type { DateParseResult } from '../common.js';
+import type { DateParseResult } from '../common/index.js';
 
 /**
  * Constraints for date validation
@@ -20,6 +20,31 @@ export type DateConstraints = {
  * Defines the interface for date validation schemas
  */
 export type DateSchema = {
+  /**
+   * Makes the schema accept undefined values
+   * @returns A new schema that accepts undefined values
+   */
+  optional: () => DateSchema & {
+    parse: (
+      value: unknown,
+    ) => DateParseResult | { success: true; value: undefined };
+  };
+
+  /**
+   * Makes the schema accept null values
+   * @returns A new schema that accepts null values
+   */
+  nullable: () => DateSchema & {
+    parse: (value: unknown) => DateParseResult | { success: true; value: null };
+  };
+
+  /**
+   * Sets a default value for the schema when the input is undefined
+   * @param defaultValue - The default value to use when the input is undefined
+   * @returns A new schema
+   * that uses the default value when the input is undefined
+   */
+  default: (defaultValue: Date) => DateSchema;
   /**
    * Parse and validate a value as a date
    * @param value - The value to validate

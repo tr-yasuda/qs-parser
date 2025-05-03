@@ -1,7 +1,8 @@
 /**
  * Validation functions for number schema
  */
-import type { NumberParseResult } from '../common.js';
+
+import type { NumberParseResult } from '../common/index.js';
 import {
   NumberErrorCode,
   NumberErrorMessages,
