@@ -1,0 +1,23 @@
+/**
+ * Common types and utilities for qs-parser schemas
+ */
+import type { ValidationError } from './error.js';
+
+/**
+ * Generic parse result interface
+ */
+export interface ParseResult<T> {
+  success: boolean;
+  value: T;
+  error?: ValidationError;
+}
+
+/**
+ * Type for string parse results
+ */
+export type StringParseResult = ParseResult<string>;
+
+/**
+ * Type for number parse results
+ */
+export type NumberParseResult = ParseResult<number>;
