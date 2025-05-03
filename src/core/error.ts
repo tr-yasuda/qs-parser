@@ -25,6 +25,7 @@ export enum StringErrorCode {
   DATETIME = 'string.datetime',
   IP = 'string.ip',
   CIDR = 'string.cidr',
+  CIDR_INVALID_IP = 'string.cidr.invalidIp',
 }
 
 /**
@@ -51,6 +52,8 @@ export const StringErrorMessages = {
   [StringErrorCode.IP]: 'String must be a valid IP address (IPv4 or IPv6)',
   [StringErrorCode.CIDR]:
     'String must be a valid CIDR notation with a prefix length between 0 and {0}',
+  [StringErrorCode.CIDR_INVALID_IP]:
+    'String must be a valid CIDR notation with a valid IP address',
 };
 
 /**

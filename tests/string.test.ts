@@ -341,14 +341,18 @@ describe('string schema', () => {
     // Invalid CIDR (invalid IP)
     const result3 = schema.parse('not-a-cidr/24');
     expect(result3.success).toBe(false);
-    expect(result3.error?.message).toContain('CIDR notation');
-    expect(result3.error?.code).toBe(StringErrorCode.CIDR);
+    expect(result3.error?.code).toBe(StringErrorCode.CIDR_INVALID_IP);
+    expect(result3.error?.message).toBe(
+      StringErrorMessages[StringErrorCode.CIDR_INVALID_IP],
+    );
 
     // Invalid CIDR (invalid prefix)
     const result4 = schema.parse('192.168.1.0/33');
     expect(result4.success).toBe(false);
-    expect(result4.error?.message).toContain('CIDR notation');
     expect(result4.error?.code).toBe(StringErrorCode.CIDR);
+    expect(result4.error?.message).toContain(
+      formatMessage(StringErrorMessages[StringErrorCode.CIDR], 32),
+    );
   });
 
   it('should chain multiple constraints', () => {

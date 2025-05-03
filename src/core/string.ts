@@ -514,9 +514,8 @@ const validateCidr = (value: string, isCidr?: boolean): StringParseResult => {
         success: false,
         value,
         error: {
-          code: StringErrorCode.CIDR,
-          message:
-            'String must be a valid CIDR notation with a valid IP address',
+          code: StringErrorCode.CIDR_INVALID_IP,
+          message: StringErrorMessages[StringErrorCode.CIDR_INVALID_IP],
         },
       };
     }
