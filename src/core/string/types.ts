@@ -1,7 +1,8 @@
 /**
  * Type definitions for string schema
  */
-import type { StringParseResult } from '../common.js';
+
+import type { StringParseResult } from '../common/index.js';
 
 /**
  * Constraints for string validation
@@ -39,6 +40,33 @@ export type StringConstraints = {
  * Defines the interface for string validation schemas
  */
 export type StringSchema = {
+  /**
+   * Makes the schema accept undefined values
+   * @returns A new schema that accepts undefined values
+   */
+  optional: () => StringSchema & {
+    parse: (
+      value: unknown,
+    ) => StringParseResult | { success: true; value: undefined };
+  };
+
+  /**
+   * Makes the schema accept null values
+   * @returns A new schema that accepts null values
+   */
+  nullable: () => StringSchema & {
+    parse: (
+      value: unknown,
+    ) => StringParseResult | { success: true; value: null };
+  };
+
+  /**
+   * Sets a default value for the schema when the input is undefined
+   * @param defaultValue - The default value to use when the input is undefined
+   * @returns A new schema
+   * that uses the default value when the input is undefined
+   */
+  default: (defaultValue: string) => StringSchema;
   /**
    * Parse and validate a value as a string
    * @param value - The value to validate

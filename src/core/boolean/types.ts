@@ -1,13 +1,40 @@
 /**
  * Type definitions for boolean schema
  */
-import type { BooleanParseResult } from '../common.js';
+import type { BooleanParseResult } from '../common/index.js';
 
 /**
  * Boolean schema type
  * Defines the interface for boolean validation schemas
  */
 export type BooleanSchema = {
+  /**
+   * Makes the schema accept undefined values
+   * @returns A new schema that accepts undefined values
+   */
+  optional: () => BooleanSchema & {
+    parse: (
+      value: unknown,
+    ) => BooleanParseResult | { success: true; value: undefined };
+  };
+
+  /**
+   * Makes the schema accept null values
+   * @returns A new schema that accepts null values
+   */
+  nullable: () => BooleanSchema & {
+    parse: (
+      value: unknown,
+    ) => BooleanParseResult | { success: true; value: null };
+  };
+
+  /**
+   * Sets a default value for the schema when the input is undefined
+   * @param defaultValue - The default value to use when the input is undefined
+   * @returns A new schema
+   * that uses the default value when the input is undefined
+   */
+  default: (defaultValue: boolean) => BooleanSchema;
   /**
    * Parse and validate a value as a boolean
    * @param value - The value to validate

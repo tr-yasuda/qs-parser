@@ -1,7 +1,12 @@
 /**
  * String schema implementation for qs-parser
  */
-import type { StringParseResult } from '../common.js';
+import type { StringParseResult } from '../common/index.js';
+import {
+  defaultValue as makeDefault,
+  nullable as makeNullable,
+  optional as makeOptional,
+} from '../common/schema.js';
 import { createSchemaWithConstraints } from '../utils/schema.js';
 import * as processors from './processors.js';
 import type { StringConstraints, StringSchema } from './types.js';
@@ -21,6 +26,18 @@ const string = (): StringSchema => {
   ): StringSchema => {
     // Create a new schema object with the new constraints
     return {
+      optional: function () {
+        return makeOptional(this);
+      },
+
+      nullable: function () {
+        return makeNullable(this);
+      },
+
+      default: function (defaultValue: string) {
+        return makeDefault(this, defaultValue);
+      },
+
       parse: (value: unknown): StringParseResult => {
         // First, validate that the value is a string
         const typeResult = validators.validateType(value);
@@ -316,222 +333,8 @@ const string = (): StringSchema => {
     };
   };
 
-  // Create the schema object
-  return {
-    parse: (value: unknown): StringParseResult => {
-      // First, validate that the value is a string
-      const typeResult = validators.validateType(value);
-      if (!typeResult.success) {
-        return typeResult;
-      }
-
-      // Now we know the value is a string
-      let stringValue = typeResult.value;
-
-      // Apply transformations if specified
-      stringValue = processors.processTrim(stringValue, constraints.trim);
-      stringValue = processors.processToLowerCase(
-        stringValue,
-        constraints.toLowerCase,
-      );
-      stringValue = processors.processToUpperCase(
-        stringValue,
-        constraints.toUpperCase,
-      );
-
-      // Validate each constraint
-      const validations = [
-        validators.validateMaxLength(stringValue, constraints.maxLength),
-        validators.validateMinLength(stringValue, constraints.minLength),
-        validators.validatePattern(stringValue, constraints.pattern),
-        validators.validateEmail(stringValue, constraints.isEmail),
-        validators.validateUrl(stringValue, constraints.isUrl),
-        validators.validateEmoji(stringValue, constraints.isEmoji),
-        validators.validateUuid(stringValue, constraints.isUuid),
-        validators.validateUuidv4(stringValue, constraints.isUuidv4),
-        validators.validateUuidv7(stringValue, constraints.isUuidv7),
-        validators.validateCuid(stringValue, constraints.isCuid),
-        validators.validateCuid2(stringValue, constraints.isCuid2),
-        validators.validateUlid(stringValue, constraints.isUlid),
-        validators.validateIncludes(stringValue, constraints.includesSubstring),
-        validators.validateStartsWith(
-          stringValue,
-          constraints.startsWithPrefix,
-        ),
-        validators.validateEndsWith(stringValue, constraints.endsWithSuffix),
-        validators.validateDatetime(stringValue, constraints.isDatetime),
-        validators.validateIp(stringValue, constraints.isIp),
-        validators.validateCidr(stringValue, constraints.isCidr),
-        validators.validateDate(stringValue, constraints.isDate),
-        validators.validateTime(stringValue, constraints.isTime),
-        validators.validateDuration(stringValue, constraints.isDuration),
-        validators.validateBase64(stringValue, constraints.isBase64),
-      ];
-
-      // Return the first validation failure, if any
-      for (const validation of validations) {
-        if (!validation.success) {
-          return validation;
-        }
-      }
-
-      // All constraints passed
-      return {
-        success: true,
-        value: stringValue,
-      };
-    },
-
-    max: (length: number): StringSchema => {
-      // Create a new schema with the max length constraint
-      const newConstraints = { ...constraints, maxLength: length };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    min: (length: number): StringSchema => {
-      // Create a new schema with the min length constraint
-      const newConstraints = { ...constraints, minLength: length };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    pattern: (regex: RegExp): StringSchema => {
-      // Create a new schema with the pattern constraint
-      const newConstraints = { ...constraints, pattern: regex };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    email: (): StringSchema => {
-      // Create a new schema with the email constraint
-      const newConstraints = { ...constraints, isEmail: true };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    url: (): StringSchema => {
-      // Create a new schema with the URL constraint
-      const newConstraints = { ...constraints, isUrl: true };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    emoji: (): StringSchema => {
-      // Create a new schema with the emoji constraint
-      const newConstraints = { ...constraints, isEmoji: true };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    uuid: (): StringSchema => {
-      // Create a new schema with the UUID constraint
-      const newConstraints = { ...constraints, isUuid: true };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    uuidv4: (): StringSchema => {
-      // Create a new schema with the UUID v4 constraint
-      const newConstraints = { ...constraints, isUuidv4: true };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    uuidv7: (): StringSchema => {
-      // Create a new schema with the UUID v7 constraint
-      const newConstraints = { ...constraints, isUuidv7: true };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    cuid: (): StringSchema => {
-      // Create a new schema with the CUID constraint
-      const newConstraints = { ...constraints, isCuid: true };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    cuid2: (): StringSchema => {
-      // Create a new schema with the CUID2 constraint
-      const newConstraints = { ...constraints, isCuid2: true };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    ulid: (): StringSchema => {
-      // Create a new schema with the ULID constraint
-      const newConstraints = { ...constraints, isUlid: true };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    includes: (substring: string): StringSchema => {
-      // Create a new schema with the includes constraint
-      const newConstraints = { ...constraints, includesSubstring: substring };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    startsWith: (prefix: string): StringSchema => {
-      // Create a new schema with the startsWith constraint
-      const newConstraints = { ...constraints, startsWithPrefix: prefix };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    endsWith: (suffix: string): StringSchema => {
-      // Create a new schema with the endsWith constraint
-      const newConstraints = { ...constraints, endsWithSuffix: suffix };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    datetime: (): StringSchema => {
-      // Create a new schema with the datetime constraint
-      const newConstraints = { ...constraints, isDatetime: true };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    ip: (): StringSchema => {
-      // Create a new schema with the IP address constraint
-      const newConstraints = { ...constraints, isIp: true };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    cidr: (): StringSchema => {
-      // Create a new schema with the CIDR notation constraint
-      const newConstraints = { ...constraints, isCidr: true };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    date: (): StringSchema => {
-      // Create a new schema with the date constraint
-      const newConstraints = { ...constraints, isDate: true };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    time: (): StringSchema => {
-      // Create a new schema with the time constraint
-      const newConstraints = { ...constraints, isTime: true };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    duration: (): StringSchema => {
-      // Create a new schema with the duration constraint
-      const newConstraints = { ...constraints, isDuration: true };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    base64: (): StringSchema => {
-      // Create a new schema with the base64 constraint
-      const newConstraints = { ...constraints, isBase64: true };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    trim: (): StringSchema => {
-      // Create a new schema with the trim constraint
-      const newConstraints = { ...constraints, trim: true };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    toLowerCase: (): StringSchema => {
-      // Create a new schema with the toLowerCase constraint
-      const newConstraints = { ...constraints, toLowerCase: true };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-
-    toUpperCase: (): StringSchema => {
-      // Create a new schema with the toUpperCase constraint
-      const newConstraints = { ...constraints, toUpperCase: true };
-      return createSchemaWithConstraints(newConstraints, createStringSchema);
-    },
-  };
+  // Create the schema object with the common methods
+  return createStringSchema(constraints);
 };
 
 export default string;

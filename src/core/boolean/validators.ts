@@ -1,7 +1,7 @@
 /**
  * Validation functions for boolean schema
  */
-import type { BooleanParseResult } from '../common.js';
+import type { BooleanParseResult } from '../common/index.js';
 import { BooleanErrorCode, BooleanErrorMessages } from '../error.js';
 
 /**

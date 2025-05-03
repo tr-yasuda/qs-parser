@@ -1,7 +1,8 @@
 /**
  * Type definitions for number schema
  */
-import type { NumberParseResult } from '../common.js';
+
+import type { NumberParseResult } from '../common/index.js';
 
 /**
  * Constraints for number validation
@@ -26,6 +27,32 @@ export type NumberConstraints = {
  * Defines the interface for number validation schemas
  */
 export type NumberSchema = {
+  /**
+   * Makes the schema accept undefined values
+   * @returns A new schema that accepts undefined values
+   */
+  optional: () => NumberSchema & {
+    parse: (
+      value: unknown,
+    ) => NumberParseResult | { success: true; value: undefined };
+  };
+
+  /**
+   * Makes the schema accept null values
+   * @returns A new schema that accepts null values
+   */
+  nullable: () => NumberSchema & {
+    parse: (
+      value: unknown,
+    ) => NumberParseResult | { success: true; value: null };
+  };
+
+  /**
+   * Sets a default value for the schema when the input is undefined
+   * @param defaultValue - The default value to use when the input is undefined
+   * @returns A new schema that uses the default value when the input is undefined
+   */
+  default: (defaultValue: number) => NumberSchema;
   /**
    * Parse a value as a number
    * @param value - The value to parse

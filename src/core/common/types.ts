@@ -1,7 +1,7 @@
 /**
- * Common types and utilities for qs-parser schemas
+ * Common types for qs-parser schemas
  */
-import type { ValidationError } from './error.js';
+import type { ValidationError } from '../error.js';
 
 /**
  * Generic parse result interface

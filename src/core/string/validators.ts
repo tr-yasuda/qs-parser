@@ -2,7 +2,7 @@
  * Validation functions for string schema
  */
 import { ipVersion, isIP } from 'is-ip';
-import type { StringParseResult } from '../common.js';
+import type { StringParseResult } from '../common/index.js';
 import {
   StringErrorCode,
   StringErrorMessages,
@@ -520,7 +520,7 @@ export const validateCidr = (
  * Validate date constraint
  * @param value - The string to validate
  * @param isDate - Whether to validate as date
- * @returns The validation result
+ * @returns The validations result
  */
 export const validateDate = (
   value: string,
@@ -560,7 +560,7 @@ export const validateDate = (
  * Validate time constraint
  * @param value - The string to validate
  * @param isTime - Whether to validate as time
- * @returns The validation result
+ * @returns The validations result
  */
 export const validateTime = (
   value: string,
@@ -587,7 +587,7 @@ export const validateTime = (
  * Validate duration constraint
  * @param value - The string to validate
  * @param isDuration - Whether to validate as duration
- * @returns The validation result
+ * @returns The validations result
  */
 export const validateDuration = (
   value: string,

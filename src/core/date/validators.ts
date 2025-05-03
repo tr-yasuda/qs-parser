@@ -1,7 +1,7 @@
 /**
  * Validation functions for date schema
  */
-import type { DateParseResult } from '../common.js';
+import type { DateParseResult } from '../common/index.js';
 import { DateErrorCode, DateErrorMessages, formatMessage } from '../error.js';
 
 /**
