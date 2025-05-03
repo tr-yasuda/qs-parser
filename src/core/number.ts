@@ -519,44 +519,43 @@ const number = (): NumberSchema => {
 
     lt: (value: number): NumberSchema => {
       // Create a new schema with the less than constraint
-      const newConstraints = { ...constraints, lt: value };
-      return createSchemaWithConstraints(newConstraints);
+      return createSchemaWithConstraints({ ...constraints, lt: value });
     },
 
     int: (): NumberSchema => {
       // Create a new schema with the integer constraint
-      const newConstraints = { ...constraints, isInt: true };
-      return createSchemaWithConstraints(newConstraints);
+      return createSchemaWithConstraints({ ...constraints, isInt: true });
     },
 
     positive: (): NumberSchema => {
       // Create a new schema with the positive constraint
-      const newConstraints = { ...constraints, isPositive: true };
-      return createSchemaWithConstraints(newConstraints);
+      return createSchemaWithConstraints({ ...constraints, isPositive: true });
     },
 
     nonNegative: (): NumberSchema => {
       // Create a new schema with the non-negative constraint
-      const newConstraints = { ...constraints, isNonNegative: true };
-      return createSchemaWithConstraints(newConstraints);
+      return createSchemaWithConstraints({
+        ...constraints,
+        isNonNegative: true,
+      });
     },
 
     negative: (): NumberSchema => {
       // Create a new schema with the negative constraint
-      const newConstraints = { ...constraints, isNegative: true };
-      return createSchemaWithConstraints(newConstraints);
+      return createSchemaWithConstraints({ ...constraints, isNegative: true });
     },
 
     nonPositive: (): NumberSchema => {
       // Create a new schema with the non-positive constraint
-      const newConstraints = { ...constraints, isNonPositive: true };
-      return createSchemaWithConstraints(newConstraints);
+      return createSchemaWithConstraints({
+        ...constraints,
+        isNonPositive: true,
+      });
     },
 
     multipleOf: (value: number): NumberSchema => {
       // Create a new schema with the multiple of constraint
-      const newConstraints = { ...constraints, multipleOf: value };
-      return createSchemaWithConstraints(newConstraints);
+      return createSchemaWithConstraints({ ...constraints, multipleOf: value });
     },
 
     step: (value: number): NumberSchema => {
@@ -566,14 +565,12 @@ const number = (): NumberSchema => {
 
     finite: (): NumberSchema => {
       // Create a new schema with the finite constraint
-      const newConstraints = { ...constraints, isFinite: true };
-      return createSchemaWithConstraints(newConstraints);
+      return createSchemaWithConstraints({ ...constraints, isFinite: true });
     },
 
     safe: (): NumberSchema => {
       // Create a new schema with the safe integer constraint
-      const newConstraints = { ...constraints, isSafe: true };
-      return createSchemaWithConstraints(newConstraints);
+      return createSchemaWithConstraints({ ...constraints, isSafe: true });
     },
   };
 
@@ -624,8 +621,7 @@ const number = (): NumberSchema => {
       },
 
       min: (value: number): NumberSchema => {
-        const updatedConstraints = { ...newConstraints, min: value };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({ ...newConstraints, min: value });
       },
 
       gte: (value: number): NumberSchema => {
@@ -634,13 +630,11 @@ const number = (): NumberSchema => {
       },
 
       gt: (value: number): NumberSchema => {
-        const updatedConstraints = { ...newConstraints, gt: value };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({ ...newConstraints, gt: value });
       },
 
       max: (value: number): NumberSchema => {
-        const updatedConstraints = { ...newConstraints, max: value };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({ ...newConstraints, max: value });
       },
 
       lte: (value: number): NumberSchema => {
@@ -649,38 +643,46 @@ const number = (): NumberSchema => {
       },
 
       lt: (value: number): NumberSchema => {
-        const updatedConstraints = { ...newConstraints, lt: value };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({ ...newConstraints, lt: value });
       },
 
       int: (): NumberSchema => {
-        const updatedConstraints = { ...newConstraints, isInt: true };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({ ...newConstraints, isInt: true });
       },
 
       positive: (): NumberSchema => {
-        const updatedConstraints = { ...newConstraints, isPositive: true };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({
+          ...newConstraints,
+          isPositive: true,
+        });
       },
 
       nonNegative: (): NumberSchema => {
-        const updatedConstraints = { ...newConstraints, isNonNegative: true };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({
+          ...newConstraints,
+          isNonNegative: true,
+        });
       },
 
       negative: (): NumberSchema => {
-        const updatedConstraints = { ...newConstraints, isNegative: true };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({
+          ...newConstraints,
+          isNegative: true,
+        });
       },
 
       nonPositive: (): NumberSchema => {
-        const updatedConstraints = { ...newConstraints, isNonPositive: true };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({
+          ...newConstraints,
+          isNonPositive: true,
+        });
       },
 
       multipleOf: (value: number): NumberSchema => {
-        const updatedConstraints = { ...newConstraints, multipleOf: value };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({
+          ...newConstraints,
+          multipleOf: value,
+        });
       },
 
       step: (value: number): NumberSchema => {
@@ -689,13 +691,14 @@ const number = (): NumberSchema => {
       },
 
       finite: (): NumberSchema => {
-        const updatedConstraints = { ...newConstraints, isFinite: true };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({
+          ...newConstraints,
+          isFinite: true,
+        });
       },
 
       safe: (): NumberSchema => {
-        const updatedConstraints = { ...newConstraints, isSafe: true };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({ ...newConstraints, isSafe: true });
       },
     };
   };

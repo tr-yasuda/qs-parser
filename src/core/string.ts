@@ -760,102 +760,111 @@ const string = (): StringSchema => {
       },
 
       max: (length: number): StringSchema => {
-        const updatedConstraints = { ...newConstraints, maxLength: length };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({
+          ...newConstraints,
+          maxLength: length,
+        });
       },
 
       min: (length: number): StringSchema => {
-        const updatedConstraints = { ...newConstraints, minLength: length };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({
+          ...newConstraints,
+          minLength: length,
+        });
       },
 
       pattern: (regex: RegExp): StringSchema => {
-        const updatedConstraints = { ...newConstraints, pattern: regex };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({
+          ...newConstraints,
+          pattern: regex,
+        });
       },
 
       email: (): StringSchema => {
-        const updatedConstraints = { ...newConstraints, isEmail: true };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({
+          ...newConstraints,
+          isEmail: true,
+        });
       },
 
       url: (): StringSchema => {
-        const updatedConstraints = { ...newConstraints, isUrl: true };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({ ...newConstraints, isUrl: true });
       },
 
       emoji: (): StringSchema => {
-        const updatedConstraints = { ...newConstraints, isEmoji: true };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({
+          ...newConstraints,
+          isEmoji: true,
+        });
       },
 
       uuid: (): StringSchema => {
-        const updatedConstraints = { ...newConstraints, isUuid: true };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({ ...newConstraints, isUuid: true });
       },
 
       uuidv4: (): StringSchema => {
-        const updatedConstraints = { ...newConstraints, isUuidv4: true };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({
+          ...newConstraints,
+          isUuidv4: true,
+        });
       },
 
       uuidv7: (): StringSchema => {
-        const updatedConstraints = { ...newConstraints, isUuidv7: true };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({
+          ...newConstraints,
+          isUuidv7: true,
+        });
       },
 
       cuid: (): StringSchema => {
-        const updatedConstraints = { ...newConstraints, isCuid: true };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({ ...newConstraints, isCuid: true });
       },
 
       cuid2: (): StringSchema => {
-        const updatedConstraints = { ...newConstraints, isCuid2: true };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({
+          ...newConstraints,
+          isCuid2: true,
+        });
       },
 
       ulid: (): StringSchema => {
-        const updatedConstraints = { ...newConstraints, isUlid: true };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({ ...newConstraints, isUlid: true });
       },
 
       includes: (substring: string): StringSchema => {
-        const updatedConstraints = {
+        return createSchemaWithConstraints({
           ...newConstraints,
           includesSubstring: substring,
-        };
-        return createSchemaWithConstraints(updatedConstraints);
+        });
       },
 
       startsWith: (prefix: string): StringSchema => {
-        const updatedConstraints = {
+        return createSchemaWithConstraints({
           ...newConstraints,
           startsWithPrefix: prefix,
-        };
-        return createSchemaWithConstraints(updatedConstraints);
+        });
       },
 
       endsWith: (suffix: string): StringSchema => {
-        const updatedConstraints = {
+        return createSchemaWithConstraints({
           ...newConstraints,
           endsWithSuffix: suffix,
-        };
-        return createSchemaWithConstraints(updatedConstraints);
+        });
       },
 
       datetime: (): StringSchema => {
-        const updatedConstraints = { ...newConstraints, isDatetime: true };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({
+          ...newConstraints,
+          isDatetime: true,
+        });
       },
 
       ip: (): StringSchema => {
-        const updatedConstraints = { ...newConstraints, isIp: true };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({ ...newConstraints, isIp: true });
       },
 
       cidr: (): StringSchema => {
-        const updatedConstraints = { ...newConstraints, isCidr: true };
-        return createSchemaWithConstraints(updatedConstraints);
+        return createSchemaWithConstraints({ ...newConstraints, isCidr: true });
       },
     };
   };
