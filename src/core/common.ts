@@ -21,3 +21,8 @@ export type StringParseResult = ParseResult<string>;
  * Type for number parse results
  */
 export type NumberParseResult = ParseResult<number>;
+
+/**
+ * Type for boolean parse results
+ */
+export type BooleanParseResult = ParseResult<boolean>;

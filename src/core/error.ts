@@ -3,6 +3,20 @@
  */
 
 /**
+ * Error codes for boolean validation
+ */
+export enum BooleanErrorCode {
+  TYPE = 'boolean.type',
+}
+
+/**
+ * Error messages for boolean validation
+ */
+export const BooleanErrorMessages = {
+  [BooleanErrorCode.TYPE]: 'Expected boolean',
+};
+
+/**
  * Error codes for string validation
  */
 export enum StringErrorCode {
