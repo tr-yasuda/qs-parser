@@ -31,3 +31,8 @@ export type BooleanParseResult = ParseResult<boolean>;
  * Type for date parse results
  */
 export type DateParseResult = ParseResult<Date>;
+
+/**
+ * Type for object parse results
+ */
+export type ObjectParseResult = ParseResult<Record<string, unknown>>;
