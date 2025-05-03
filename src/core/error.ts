@@ -66,6 +66,10 @@ export enum StringErrorCode {
   IP = 'string.ip',
   CIDR = 'string.cidr',
   CIDR_INVALID_IP = 'string.cidr.invalidIp',
+  DATE = 'string.date',
+  TIME = 'string.time',
+  DURATION = 'string.duration',
+  BASE64 = 'string.base64',
 }
 
 /**
@@ -94,6 +98,10 @@ export const StringErrorMessages = {
     'String must be a valid CIDR notation with a prefix length between 0 and {0}',
   [StringErrorCode.CIDR_INVALID_IP]:
     'String must be a valid CIDR notation with a valid IP address',
+  [StringErrorCode.DATE]: 'String must be a valid date',
+  [StringErrorCode.TIME]: 'String must be a valid time (HH:MM:SS)',
+  [StringErrorCode.DURATION]: 'String must be a valid duration (e.g., PT1H30M)',
+  [StringErrorCode.BASE64]: 'String must be a valid base64 encoded string',
 };
 
 /**

@@ -1,7 +1,7 @@
-import boolean from './core/boolean.js';
-import date from './core/date.js';
-import number from './core/number.js';
-import string from './core/string.js';
+import boolean from './core/boolean/index.js';
+import date from './core/date/index.js';
+import number from './core/number/index.js';
+import string from './core/string/index.js';
 
 export const q = {
   string,
