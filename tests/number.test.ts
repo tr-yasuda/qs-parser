@@ -13,16 +13,20 @@ describe('number schema', () => {
     expect(result1.value).toBe(123);
 
     // Non-number value
-    const result2 = schema.parse('123');
+    const stringValue = '123';
+    const result2 = schema.parse(stringValue);
     expect(result2.success).toBe(false);
+    expect(result2.value).toBe(stringValue); // Original value is preserved
     expect(result2.error?.message).toContain(
       NumberErrorMessages[NumberErrorCode.TYPE],
     );
     expect(result2.error?.code).toBe(NumberErrorCode.TYPE);
 
     // NaN value
-    const result3 = schema.parse(Number.NaN);
+    const nanValue = Number.NaN;
+    const result3 = schema.parse(nanValue);
     expect(result3.success).toBe(false);
+    expect(Number.isNaN(result3.value)).toBe(true); // Original NaN value is preserved
     expect(result3.error?.message).toContain(
       NumberErrorMessages[NumberErrorCode.TYPE],
     );

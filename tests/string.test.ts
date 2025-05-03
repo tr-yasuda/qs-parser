@@ -13,8 +13,10 @@ describe('string schema', () => {
     expect(result1.value).toBe('hello');
 
     // Non-string value
-    const result2 = schema.parse(123);
+    const numberValue = 123;
+    const result2 = schema.parse(numberValue);
     expect(result2.success).toBe(false);
+    expect(result2.value).toBe(numberValue); // Original value is preserved
     expect(result2.error?.message).toContain(
       StringErrorMessages[StringErrorCode.TYPE],
     );

@@ -29,8 +29,9 @@ type NumberConstraints = {
 
 /**
  * Number schema type
+ * Defines the interface for number validation schemas
  */
-type NumberSchema = {
+export type NumberSchema = {
   /**
    * Parse a value as a number
    * @param value - The value to parse
@@ -144,7 +145,9 @@ type NumberSchema = {
 /**
  * Validate that a value is a number
  * @param value - The value to validate
- * @returns The validation result
+ * @returns The validation result with the original input value preserved in error cases.
+ *          Note: The type assertion (value as number) does not perform any transformation
+ *          at runtime; it only informs TypeScript about the expected type.
  */
 const validateType = (value: unknown): NumberParseResult => {
   if (typeof value !== 'number' || Number.isNaN(value)) {
@@ -153,7 +156,7 @@ const validateType = (value: unknown): NumberParseResult => {
     }`;
     return {
       success: false,
-      value: typeof value === 'number' ? value : 0,
+      value: value as number, // Original value preserved without coercion
       error: {
         code: NumberErrorCode.TYPE,
         message,

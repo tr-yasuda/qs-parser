@@ -36,8 +36,17 @@ type StringConstraints = {
 
 /**
  * String schema type
+ * Defines the interface for string validation schemas
  */
-type StringSchema = {
+export type StringSchema = {
+  /**
+   * Parse and validate a value as a string
+   * @param value - The value to validate
+   * @returns A parse result containing:
+   *   - success: true if validation passed, false otherwise
+   *   - value: the original input value (preserved without coercion in error cases)
+   *   - error: validation error details if success is false
+   */
   parse: (value: unknown) => StringParseResult;
   max: (length: number) => StringSchema;
   min: (length: number) => StringSchema;
@@ -66,13 +75,15 @@ type StringSchema = {
 /**
  * Validate that a value is a string
  * @param value - The value to validate
- * @returns The validation result
+ * @returns The validation result with the original input value preserved in error cases.
+ *          Note: The type assertion (value as string) does not perform any transformation
+ *          at runtime; it only informs TypeScript about the expected type.
  */
 const validateType = (value: unknown): StringParseResult => {
   if (typeof value !== 'string') {
     return {
       success: false,
-      value: String(value),
+      value: value as string, // Original value preserved without coercion
       error: {
         code: StringErrorCode.TYPE,
         message: `${StringErrorMessages[StringErrorCode.TYPE]}, got ${typeof value}`,
