@@ -8,10 +8,34 @@ import { DateErrorCode, DateErrorMessages, formatMessage } from '../error.js';
  * Validate that a value is a date
  * @param value - The value to validate
  * @returns The validation result with the original input value preserved in error cases.
- *          Note: The type assertion (value as Date) does not perform any transformation
+ *          If the value is a string in YYYY-MM-DD format, it will be parsed into a Date.
+ *          Note: The type assertion (value as unknown as Date) does not perform any transformation
  *          at runtime; it only informs TypeScript about the expected type.
  */
 export const validateType = (value: unknown): DateParseResult => {
+  // If the value is a string, try to parse it as a Date
+  if (typeof value === 'string') {
+    // Check if the string is in YYYY-MM-DD format
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (dateRegex.test(value)) {
+      const parsedDate = new Date(value);
+      if (!Number.isNaN(parsedDate.getTime())) {
+        return { success: true, value: parsedDate };
+      }
+    }
+
+    // If it's not a valid date string, return an error
+    return {
+      success: false,
+      // Original value preserved without coercion
+      value: value as unknown as Date,
+      error: {
+        code: DateErrorCode.TYPE,
+        message: `${DateErrorMessages[DateErrorCode.TYPE]}, got ${typeof value}`,
+      },
+    };
+  }
+
   // Check if the value is a Date object
   if (!(value instanceof Date) || Number.isNaN(value.getTime())) {
     return {

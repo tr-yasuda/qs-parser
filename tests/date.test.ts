@@ -13,25 +13,34 @@ describe('date schema', () => {
     expect(result1.success).toBe(true);
     expect(result1.value).toBe(validDate);
 
-    // Invalid date (not a Date object)
+    // Valid date string (in YYYY-MM-DD format)
     const stringValue = '2023-01-01';
     const result2 = schema.parse(stringValue);
-    expect(result2.success).toBe(false);
-    expect(result2.value).toBe(stringValue); // Original value is preserved
-    expect(result2.error?.message).toContain(
-      DateErrorMessages[DateErrorCode.TYPE],
-    );
-    expect(result2.error?.code).toBe(DateErrorCode.TYPE);
+    expect(result2.success).toBe(true);
+    expect(result2.value).toBeInstanceOf(Date);
+    expect(result2.value.getFullYear()).toBe(2023);
+    expect(result2.value.getMonth()).toBe(0); // January is 0
+    expect(result2.value.getDate()).toBe(1);
 
-    // Invalid date (Invalid Date)
-    const invalidDate = new Date('invalid-date');
-    const result3 = schema.parse(invalidDate);
+    // Invalid date string (wrong format)
+    const invalidStringValue = '01/01/2023';
+    const result3 = schema.parse(invalidStringValue);
     expect(result3.success).toBe(false);
-    expect(result3.value).toBe(invalidDate); // Original value is preserved
+    expect(result3.value).toBe(invalidStringValue); // Original value is preserved
     expect(result3.error?.message).toContain(
       DateErrorMessages[DateErrorCode.TYPE],
     );
     expect(result3.error?.code).toBe(DateErrorCode.TYPE);
+
+    // Invalid date (Invalid Date)
+    const invalidDate = new Date('invalid-date');
+    const result4 = schema.parse(invalidDate);
+    expect(result4.success).toBe(false);
+    expect(result4.value).toBe(invalidDate); // Original value is preserved
+    expect(result4.error?.message).toContain(
+      DateErrorMessages[DateErrorCode.TYPE],
+    );
+    expect(result4.error?.code).toBe(DateErrorCode.TYPE);
   });
 
   it('should validate min date', () => {
