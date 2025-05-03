@@ -247,9 +247,7 @@ describe('number schema', () => {
     const result1 = schema.parse(42);
     expect(result1.success).toBe(true);
 
-    // Invalid (Infinity)
-    // biome-ignore lint/style/useNumberNamespace: <explanation>
-        const result2 = schema.parse(Infinity);
+    const result2 = schema.parse(Number.POSITIVE_INFINITY);
     expect(result2.success).toBe(false);
     expect(result2.error).toContain('finite');
 
@@ -278,12 +276,7 @@ describe('number schema', () => {
   });
 
   it('should chain multiple constraints', () => {
-    const schema = q
-      .number()
-      .gt(0)
-      .lt(100)
-      .int()
-      .step(5);
+    const schema = q.number().gt(0).lt(100).int().step(5);
 
     // Valid number
     const result1 = schema.parse(25);
