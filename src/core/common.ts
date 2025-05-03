@@ -26,3 +26,8 @@ export type NumberParseResult = ParseResult<number>;
  * Type for boolean parse results
  */
 export type BooleanParseResult = ParseResult<boolean>;
+
+/**
+ * Type for date parse results
+ */
+export type DateParseResult = ParseResult<Date>;
