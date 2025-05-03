@@ -337,7 +337,7 @@ describe('number schema', () => {
     expect(result2.success).toBe(false);
     expect(result2.error?.code).toBe(NumberErrorCode.GT);
     expect(result2.error?.message).toContain(
-      formatMessage(NumberErrorMessages[NumberErrorCode.GT], 0)
+      formatMessage(NumberErrorMessages[NumberErrorCode.GT], 0),
     );
 
     // Too large
@@ -345,7 +345,7 @@ describe('number schema', () => {
     expect(result3.success).toBe(false);
     expect(result3.error?.code).toBe(NumberErrorCode.LT);
     expect(result3.error?.message).toContain(
-      formatMessage(NumberErrorMessages[NumberErrorCode.LT], 100)
+      formatMessage(NumberErrorMessages[NumberErrorCode.LT], 100),
     );
 
     // Not an integer
@@ -353,7 +353,7 @@ describe('number schema', () => {
     expect(result4.success).toBe(false);
     expect(result4.error?.code).toBe(NumberErrorCode.INT);
     expect(result4.error?.message).toContain(
-      NumberErrorMessages[NumberErrorCode.INT]
+      NumberErrorMessages[NumberErrorCode.INT],
     );
 
     // Not a multiple of 5
@@ -361,7 +361,7 @@ describe('number schema', () => {
     expect(result5.success).toBe(false);
     expect(result5.error?.code).toBe(NumberErrorCode.MULTIPLE_OF);
     expect(result5.error?.message).toContain(
-      formatMessage(NumberErrorMessages[NumberErrorCode.MULTIPLE_OF], 5)
+      formatMessage(NumberErrorMessages[NumberErrorCode.MULTIPLE_OF], 5),
     );
   });
 });

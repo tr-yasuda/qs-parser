@@ -365,15 +365,24 @@ describe('string schema', () => {
     const result2 = schema.parse('hi');
     expect(result2.success).toBe(false);
     expect(result2.error?.code).toBe(StringErrorCode.MIN_LENGTH);
+    expect(result2.error?.message).toContain(
+      formatMessage(StringErrorMessages[StringErrorCode.MIN_LENGTH], minLength),
+    );
 
     // Too long
     const result3 = schema.parse('hello-world-too-long');
     expect(result3.success).toBe(false);
     expect(result3.error?.code).toBe(StringErrorCode.MAX_LENGTH);
+    expect(result3.error?.message).toContain(
+      formatMessage(StringErrorMessages[StringErrorCode.MAX_LENGTH], maxLength),
+    );
 
     // Invalid pattern
     const result4 = schema.parse('Hello123');
     expect(result4.success).toBe(false);
     expect(result4.error?.code).toBe(StringErrorCode.PATTERN);
+    expect(result4.error?.message).toContain(
+      formatMessage(StringErrorMessages[StringErrorCode.PATTERN], pattern),
+    );
   });
 });
