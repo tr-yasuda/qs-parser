@@ -37,14 +37,12 @@ const validateType = (value: unknown): BooleanParseResult => {
  */
 const boolean = (): BooleanSchema => {
   // Create the schema object
-  const schema: BooleanSchema = {
+  return {
     parse: (value: unknown): BooleanParseResult => {
       // Validate that the value is a boolean
       return validateType(value);
     },
   };
-
-  return schema;
 };
 
 // Export the boolean schema creator
