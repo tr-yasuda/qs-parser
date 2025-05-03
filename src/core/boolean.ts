@@ -7,21 +7,32 @@ import { BooleanErrorCode, BooleanErrorMessages } from './error.js';
 
 /**
  * Boolean schema type
+ * Defines the interface for boolean validation schemas
  */
-type BooleanSchema = {
+export type BooleanSchema = {
+  /**
+   * Parse and validate a value as a boolean
+   * @param value - The value to validate
+   * @returns A parse result containing:
+   *   - success: true if validation passed, false otherwise
+   *   - value: the original input value (preserved without coercion in error cases)
+   *   - error: validation error details if success is false
+   */
   parse: (value: unknown) => BooleanParseResult;
 };
 
 /**
  * Validate that a value is a boolean
  * @param value - The value to validate
- * @returns The validation result
+ * @returns The validation result with the original input value preserved in error cases.
+ *          Note: The type assertion (value as boolean) does not perform any transformation
+ *          at runtime; it only informs TypeScript about the expected type.
  */
 const validateType = (value: unknown): BooleanParseResult => {
   if (typeof value !== 'boolean') {
     return {
       success: false,
-      value: value as boolean, // Return the original value without coercion
+      value: value as boolean, // Original value preserved without coercion
       error: {
         code: BooleanErrorCode.TYPE,
         message: `${BooleanErrorMessages[BooleanErrorCode.TYPE]}, got ${typeof value}`,
