@@ -193,7 +193,7 @@ describe('object schema', () => {
     expect(result2.error?.message).toContain('email');
     expect(result2.error?.message).toContain('phone');
 
-    // Test with non-strict nested object inside strict parent
+    // Test with a non-strict nested object inside strict parent
     const mixedSchema = q
       .object({
         name: q.string(),
@@ -209,7 +209,7 @@ describe('object schema', () => {
       profile: {
         bio: 'Developer',
         skills: 'JavaScript, TypeScript',
-        // Extra property in non-strict nested object should be allowed
+        // Extra property in a non-strict nested object should be allowed
         experience: '5 years',
       },
     };

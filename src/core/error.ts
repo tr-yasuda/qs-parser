@@ -171,6 +171,26 @@ export const ObjectErrorMessages = {
 };
 
 /**
+ * Error codes for array validation
+ */
+export enum ArrayErrorCode {
+  TYPE = 'array.type',
+  MIN_LENGTH = 'array.minLength',
+  MAX_LENGTH = 'array.maxLength',
+  ITEM_INVALID = 'array.itemInvalid',
+}
+
+/**
+ * Error messages for array validation
+ */
+export const ArrayErrorMessages = {
+  [ArrayErrorCode.TYPE]: 'Expected array',
+  [ArrayErrorCode.MIN_LENGTH]: 'Array must contain at least {0} item(s)',
+  [ArrayErrorCode.MAX_LENGTH]: 'Array must contain at most {0} item(s)',
+  [ArrayErrorCode.ITEM_INVALID]: 'Invalid item at index {0}',
+};
+
+/**
  * Format a message with parameters
  * @param message - The message template
  * @param params - The parameters to insert
