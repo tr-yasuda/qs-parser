@@ -18,8 +18,23 @@ export const validateType = (value: unknown): DateParseResult => {
     // Check if the string is in YYYY-MM-DD format
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
     if (dateRegex.test(value)) {
-      const parsedDate = new Date(value);
-      if (!Number.isNaN(parsedDate.getTime())) {
+      // Extract the year, month, and day from the string
+      const [yearStr, monthStr, dayStr] = value.split('-');
+      const year = Number.parseInt(yearStr, 10);
+      const month = Number.parseInt(monthStr, 10) - 1; // JavaScript months are 0-based
+      const day = Number.parseInt(dayStr, 10);
+
+      // Create a new Date object
+      const parsedDate = new Date(year, month, day);
+
+      // Check if the date is valid by comparing the original components with the parsed ones
+      // If JavaScript adjusted the date (e.g., April 31 -> May 1), the components won't match
+      if (
+        !Number.isNaN(parsedDate.getTime()) &&
+        parsedDate.getFullYear() === year &&
+        parsedDate.getMonth() === month &&
+        parsedDate.getDate() === day
+      ) {
         return { success: true, value: parsedDate };
       }
     }
