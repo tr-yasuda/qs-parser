@@ -1,9 +1,13 @@
+import type { NumberParseResult } from './common.js';
 /**
  * Number schema implementation for qs-parser
  * Provides methods for creating and validating number schemas
  */
-import { NumberErrorCode, NumberErrorMessages, formatMessage } from './error.js';
-import { NumberParseResult } from './common.js';
+import {
+  NumberErrorCode,
+  NumberErrorMessages,
+  formatMessage,
+} from './error.js';
 
 /**
  * Constraints for number validation

@@ -107,7 +107,10 @@ export type ValidationError = {
  * @param params - The parameters to insert
  * @returns The formatted message
  */
-export const formatMessage = (message: string, ...params: (string | number | RegExp)[]): string => {
+export const formatMessage = (
+  message: string,
+  ...params: (string | number | RegExp)[]
+): string => {
   return message.replace(/{(\d+)}/g, (match, index) => {
     return params[Number.parseInt(index)] !== undefined
       ? String(params[Number.parseInt(index)])

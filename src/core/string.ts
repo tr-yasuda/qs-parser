@@ -3,8 +3,12 @@
  * Provides methods for creating and validating string schemas
  */
 import { ipVersion, isIP } from 'is-ip';
-import { StringErrorCode, StringErrorMessages, formatMessage } from './error.js';
-import { StringParseResult } from './common.js';
+import type { StringParseResult } from './common.js';
+import {
+  StringErrorCode,
+  StringErrorMessages,
+  formatMessage,
+} from './error.js';
 
 /**
  * Constraints for string validation
