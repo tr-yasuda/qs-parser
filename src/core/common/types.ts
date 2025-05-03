@@ -36,3 +36,8 @@ export type DateParseResult = ParseResult<Date>;
  * Type for object parse results
  */
 export type ObjectParseResult = ParseResult<Record<string, unknown>>;
+
+/**
+ * Type for array parse results
+ */
+export type ArrayParseResult = ParseResult<unknown[]>;
