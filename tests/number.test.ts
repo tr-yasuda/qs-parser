@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { NumberErrorCode, NumberErrorMessages } from '../src/core/error.js';
 import { q } from '../src/index.js';
+import { formatMessage } from './helper.js';
 
 describe('number schema', () => {
   it('should validate numbers', () => {
@@ -13,233 +15,253 @@ describe('number schema', () => {
     // Non-number value
     const result2 = schema.parse('123');
     expect(result2.success).toBe(false);
-    expect(result2.error).toContain('Expected number');
+    expect(result2.error?.message).toContain(
+      NumberErrorMessages[NumberErrorCode.TYPE],
+    );
+    expect(result2.error?.code).toBe(NumberErrorCode.TYPE);
 
     // NaN value
     const result3 = schema.parse(Number.NaN);
     expect(result3.success).toBe(false);
-    expect(result3.error).toContain('Expected number');
+    expect(result3.error?.message).toContain(
+      NumberErrorMessages[NumberErrorCode.TYPE],
+    );
+    expect(result3.error?.code).toBe(NumberErrorCode.TYPE);
   });
 
-  it('should validate min value', () => {
-    const schema = q.number().min(5);
+  // Parameterized tests for comparison constraints
+  describe.each([
+    {
+      name: 'min',
+      method: 'min',
+      schema: q.number().min(5),
+      value: 5,
+      validEqual: true,
+      errorCode: NumberErrorCode.MIN,
+    },
+    {
+      name: 'gte (alias for min)',
+      method: 'gte',
+      schema: q.number().gte(5),
+      value: 5,
+      validEqual: true,
+      errorCode: NumberErrorCode.MIN,
+    },
+    {
+      name: 'gt (greater than)',
+      method: 'gt',
+      schema: q.number().gt(5),
+      value: 5,
+      validEqual: false,
+      errorCode: NumberErrorCode.GT,
+    },
+    {
+      name: 'max',
+      method: 'max',
+      schema: q.number().max(10),
+      value: 10,
+      validEqual: true,
+      errorCode: NumberErrorCode.MAX,
+    },
+    {
+      name: 'lte (alias for max)',
+      method: 'lte',
+      schema: q.number().lte(10),
+      value: 10,
+      validEqual: true,
+      errorCode: NumberErrorCode.MAX,
+    },
+    {
+      name: 'lt (less than)',
+      method: 'lt',
+      schema: q.number().lt(10),
+      value: 10,
+      validEqual: false,
+      errorCode: NumberErrorCode.LT,
+    },
+  ])('$name constraint', ({ method, value, schema, validEqual, errorCode }) => {
+    it('validates correctly', () => {
+      // For min/gte/gt: above = higher value, below = lower value
+      // For max/lte/lt: above = higher value, below = lower value
+      const isMinType = method === 'min' || method === 'gte' || method === 'gt';
 
-    // Valid (above min)
-    const result1 = schema.parse(10);
-    expect(result1.success).toBe(true);
+      // Test value above the threshold (higher number)
+      const higherValue = value + 5;
+      const result1 = schema.parse(higherValue);
+      expect(result1.success).toBe(isMinType);
+      if (!result1.success) {
+        expect(result1.error?.code).toBe(errorCode);
+        // Check the message format based on error code
+        if (errorCode === NumberErrorCode.MAX) {
+          expect(result1.error?.message).toContain(
+            formatMessage(NumberErrorMessages[NumberErrorCode.MAX], value),
+          );
+        } else if (errorCode === NumberErrorCode.LT) {
+          expect(result1.error?.message).toContain(
+            formatMessage(NumberErrorMessages[NumberErrorCode.LT], value),
+          );
+        }
+      }
 
-    // Valid (equal to min)
-    const result2 = schema.parse(5);
-    expect(result2.success).toBe(true);
+      // Test value equal to the threshold
+      const result2 = schema.parse(value);
+      expect(result2.success).toBe(validEqual);
+      if (!validEqual) {
+        expect(result2.error?.code).toBe(errorCode);
+        // Check the message format based on error code
+        if (errorCode === NumberErrorCode.GT) {
+          expect(result2.error?.message).toContain(
+            formatMessage(NumberErrorMessages[NumberErrorCode.GT], value),
+          );
+        } else if (errorCode === NumberErrorCode.LT) {
+          expect(result2.error?.message).toContain(
+            formatMessage(NumberErrorMessages[NumberErrorCode.LT], value),
+          );
+        }
+      }
 
-    // Invalid (below min)
-    const result3 = schema.parse(4);
-    expect(result3.success).toBe(false);
-    expect(result3.error).toContain('at least 5');
+      // Test value below the threshold (lower number)
+      const lowerValue = value - 1;
+      const result3 = schema.parse(lowerValue);
+      expect(result3.success).toBe(!isMinType);
+      if (!result3.success) {
+        expect(result3.error?.code).toBe(errorCode);
+        // Check the message format based on error code
+        if (errorCode === NumberErrorCode.MIN) {
+          expect(result3.error?.message).toContain(
+            formatMessage(NumberErrorMessages[NumberErrorCode.MIN], value),
+          );
+        } else if (errorCode === NumberErrorCode.GT) {
+          expect(result3.error?.message).toContain(
+            formatMessage(NumberErrorMessages[NumberErrorCode.GT], value),
+          );
+        }
+      }
+    });
   });
 
-  it('should validate gte (alias for min)', () => {
-    const schema = q.number().gte(5);
+  // Parameterized tests for sign constraints
+  describe.each([
+    {
+      method: 'positive',
+      schema: q.number().positive(),
+      validPositive: true,
+      validZero: false,
+      validNegative: false,
+      errorCode: NumberErrorCode.POSITIVE,
+    },
+    {
+      method: 'nonNegative',
+      schema: q.number().nonNegative(),
+      validPositive: true,
+      validZero: true,
+      validNegative: false,
+      errorCode: NumberErrorCode.NON_NEGATIVE,
+    },
+    {
+      method: 'negative',
+      schema: q.number().negative(),
+      validPositive: false,
+      validZero: false,
+      validNegative: true,
+      errorCode: NumberErrorCode.NEGATIVE,
+    },
+    {
+      method: 'nonPositive',
+      schema: q.number().nonPositive(),
+      validPositive: false,
+      validZero: true,
+      validNegative: true,
+      errorCode: NumberErrorCode.NON_POSITIVE,
+    },
+  ])(
+    '$name constraint',
+    ({ schema, validPositive, validZero, validNegative, errorCode }) => {
+      it('validates correctly', () => {
+        // Test positive value
+        const result1 = schema.parse(42);
+        expect(result1.success).toBe(validPositive);
+        if (!validPositive) {
+          expect(result1.error?.code).toBe(errorCode);
+          expect(result1.error?.message).toContain(
+            NumberErrorMessages[errorCode],
+          );
+        }
 
-    // Valid (above min)
-    const result1 = schema.parse(10);
-    expect(result1.success).toBe(true);
+        // Test zero
+        const result2 = schema.parse(0);
+        expect(result2.success).toBe(validZero);
+        if (!validZero) {
+          expect(result2.error?.code).toBe(errorCode);
+          expect(result2.error?.message).toContain(
+            NumberErrorMessages[errorCode],
+          );
+        }
 
-    // Valid (equal to min)
-    const result2 = schema.parse(5);
-    expect(result2.success).toBe(true);
+        // Test negative value
+        const result3 = schema.parse(-42);
+        expect(result3.success).toBe(validNegative);
+        if (!validNegative) {
+          expect(result3.error?.code).toBe(errorCode);
+          expect(result3.error?.message).toContain(
+            NumberErrorMessages[errorCode],
+          );
+        }
+      });
+    },
+  );
 
-    // Invalid (below min)
-    const result3 = schema.parse(4);
-    expect(result3.success).toBe(false);
-    expect(result3.error).toContain('at least 5');
-  });
+  // Parameterized tests for type constraints
+  describe.each([
+    {
+      name: 'integer',
+      schema: q.number().int(),
+      validInteger: true,
+      validDecimal: false,
+      errorCode: NumberErrorCode.INT,
+    },
+    {
+      name: 'safe integer',
+      schema: q.number().safe(),
+      validInteger: true,
+      validDecimal: false,
+      validUnsafe: false,
+      errorCode: NumberErrorCode.SAFE,
+    },
+  ])(
+    '$name constraint',
+    ({ schema, validInteger, validDecimal, validUnsafe, errorCode }) => {
+      it('validates correctly', () => {
+        // Test integer value
+        const result1 = schema.parse(42);
+        expect(result1.success).toBe(validInteger);
 
-  it('should validate gt (greater than)', () => {
-    const schema = q.number().gt(5);
+        // Test decimal value
+        const result2 = schema.parse(42.5);
+        expect(result2.success).toBe(validDecimal);
+        if (!validDecimal) {
+          expect(result2.error?.code).toBe(errorCode);
+          expect(result2.error?.message).toContain(
+            NumberErrorMessages[errorCode],
+          );
+        }
 
-    // Valid (above the threshold)
-    const result1 = schema.parse(6);
-    expect(result1.success).toBe(true);
+        // Test unsafe integer if applicable
+        if (validUnsafe !== undefined) {
+          const result3 = schema.parse(Number.MAX_SAFE_INTEGER + 1);
+          expect(result3.success).toBe(validUnsafe);
+          if (!validUnsafe) {
+            expect(result3.error?.code).toBe(errorCode);
+            expect(result3.error?.message).toContain(
+              NumberErrorMessages[errorCode],
+            );
+          }
+        }
+      });
+    },
+  );
 
-    // Invalid (equal to the threshold)
-    const result2 = schema.parse(5);
-    expect(result2.success).toBe(false);
-    expect(result2.error).toContain('greater than 5');
-
-    // Invalid (below the threshold)
-    const result3 = schema.parse(4);
-    expect(result3.success).toBe(false);
-    expect(result3.error).toContain('greater than 5');
-  });
-
-  it('should validate max value', () => {
-    const schema = q.number().max(10);
-
-    // Valid (below max)
-    const result1 = schema.parse(5);
-    expect(result1.success).toBe(true);
-
-    // Valid (equal to max)
-    const result2 = schema.parse(10);
-    expect(result2.success).toBe(true);
-
-    // Invalid (above max)
-    const result3 = schema.parse(11);
-    expect(result3.success).toBe(false);
-    expect(result3.error).toContain('at most 10');
-  });
-
-  it('should validate lte (alias for max)', () => {
-    const schema = q.number().lte(10);
-
-    // Valid (below max)
-    const result1 = schema.parse(5);
-    expect(result1.success).toBe(true);
-
-    // Valid (equal to max)
-    const result2 = schema.parse(10);
-    expect(result2.success).toBe(true);
-
-    // Invalid (above max)
-    const result3 = schema.parse(11);
-    expect(result3.success).toBe(false);
-    expect(result3.error).toContain('at most 10');
-  });
-
-  it('should validate lt (less than)', () => {
-    const schema = q.number().lt(10);
-
-    // Valid (below the threshold)
-    const result1 = schema.parse(9);
-    expect(result1.success).toBe(true);
-
-    // Invalid (equal to the threshold)
-    const result2 = schema.parse(10);
-    expect(result2.success).toBe(false);
-    expect(result2.error).toContain('less than 10');
-
-    // Invalid (above the threshold)
-    const result3 = schema.parse(11);
-    expect(result3.success).toBe(false);
-    expect(result3.error).toContain('less than 10');
-  });
-
-  it('should validate integer', () => {
-    const schema = q.number().int();
-
-    // Valid integer
-    const result1 = schema.parse(42);
-    expect(result1.success).toBe(true);
-
-    // Invalid (decimal)
-    const result2 = schema.parse(42.5);
-    expect(result2.success).toBe(false);
-    expect(result2.error).toContain('integer');
-  });
-
-  it('should validate positive', () => {
-    const schema = q.number().positive();
-
-    // Valid positive
-    const result1 = schema.parse(42);
-    expect(result1.success).toBe(true);
-
-    // Invalid (zero)
-    const result2 = schema.parse(0);
-    expect(result2.success).toBe(false);
-    expect(result2.error).toContain('positive');
-
-    // Invalid (negative)
-    const result3 = schema.parse(-42);
-    expect(result3.success).toBe(false);
-    expect(result3.error).toContain('positive');
-  });
-
-  it('should validate nonNegative', () => {
-    const schema = q.number().nonNegative();
-
-    // Valid positive
-    const result1 = schema.parse(42);
-    expect(result1.success).toBe(true);
-
-    // Valid (zero)
-    const result2 = schema.parse(0);
-    expect(result2.success).toBe(true);
-
-    // Invalid (negative)
-    const result3 = schema.parse(-42);
-    expect(result3.success).toBe(false);
-    expect(result3.error).toContain('non-negative');
-  });
-
-  it('should validate negative', () => {
-    const schema = q.number().negative();
-
-    // Valid negative
-    const result1 = schema.parse(-42);
-    expect(result1.success).toBe(true);
-
-    // Invalid (zero)
-    const result2 = schema.parse(0);
-    expect(result2.success).toBe(false);
-    expect(result2.error).toContain('negative');
-
-    // Invalid (positive)
-    const result3 = schema.parse(42);
-    expect(result3.success).toBe(false);
-    expect(result3.error).toContain('negative');
-  });
-
-  it('should validate nonPositive', () => {
-    const schema = q.number().nonPositive();
-
-    // Valid negative
-    const result1 = schema.parse(-42);
-    expect(result1.success).toBe(true);
-
-    // Valid (zero)
-    const result2 = schema.parse(0);
-    expect(result2.success).toBe(true);
-
-    // Invalid (positive)
-    const result3 = schema.parse(42);
-    expect(result3.success).toBe(false);
-    expect(result3.error).toContain('non-positive');
-  });
-
-  it('should validate multipleOf', () => {
-    const schema = q.number().multipleOf(5);
-
-    // Valid multiple
-    const result1 = schema.parse(15);
-    expect(result1.success).toBe(true);
-
-    // Invalid (not a multiple)
-    const result2 = schema.parse(17);
-    expect(result2.success).toBe(false);
-    expect(result2.error).toContain('multiple of 5');
-
-    // Error case (multiple of zero)
-    const schema2 = q.number().multipleOf(0);
-    const result3 = schema2.parse(42);
-    expect(result3.success).toBe(false);
-    expect(result3.error).toContain('Cannot check for multiples of zero');
-  });
-
-  it('should validate step (alias for multipleOf)', () => {
-    const schema = q.number().step(5);
-
-    // Valid multiple
-    const result1 = schema.parse(15);
-    expect(result1.success).toBe(true);
-
-    // Invalid (not a multiple)
-    const result2 = schema.parse(17);
-    expect(result2.success).toBe(false);
-    expect(result2.error).toContain('multiple of 5');
-  });
-
+  // Test for finite constraint separately due to its unique test cases
   it('should validate finite', () => {
     const schema = q.number().finite();
 
@@ -247,32 +269,60 @@ describe('number schema', () => {
     const result1 = schema.parse(42);
     expect(result1.success).toBe(true);
 
+    // Invalid (Infinity)
     const result2 = schema.parse(Number.POSITIVE_INFINITY);
     expect(result2.success).toBe(false);
-    expect(result2.error).toContain('finite');
+    expect(result2.error?.code).toBe(NumberErrorCode.FINITE);
+    expect(result2.error?.message).toContain(
+      NumberErrorMessages[NumberErrorCode.FINITE],
+    );
 
     // Invalid (-Infinity)
     const result3 = schema.parse(Number.NEGATIVE_INFINITY);
     expect(result3.success).toBe(false);
-    expect(result3.error).toContain('finite');
+    expect(result3.error?.code).toBe(NumberErrorCode.FINITE);
+    expect(result3.error?.message).toContain(
+      NumberErrorMessages[NumberErrorCode.FINITE],
+    );
   });
 
-  it('should validate safe', () => {
-    const schema = q.number().safe();
+  // Parameterized tests for multiple constraints
+  describe.each([
+    {
+      name: 'multipleOf',
+      schema: q.number().multipleOf(5),
+      value: 5,
+    },
+    {
+      name: 'step (alias for multipleOf)',
+      schema: q.number().step(5),
+      value: 5,
+    },
+  ])('$name constraint', ({ schema, value }) => {
+    it('validates correctly', () => {
+      // Valid multiple
+      const result1 = schema.parse(15);
+      expect(result1.success).toBe(true);
 
-    // Valid safe integer
-    const result1 = schema.parse(42);
-    expect(result1.success).toBe(true);
+      // Invalid (not a multiple)
+      const result2 = schema.parse(17);
+      expect(result2.success).toBe(false);
+      expect(result2.error?.code).toBe(NumberErrorCode.MULTIPLE_OF);
+      expect(result2.error?.message).toContain(
+        formatMessage(NumberErrorMessages[NumberErrorCode.MULTIPLE_OF], value),
+      );
+    });
+  });
 
-    // Invalid (too large)
-    const result2 = schema.parse(Number.MAX_SAFE_INTEGER + 1);
-    expect(result2.success).toBe(false);
-    expect(result2.error).toContain('safe integer');
-
-    // Invalid (decimal)
-    const result3 = schema.parse(42.5);
-    expect(result3.success).toBe(false);
-    expect(result3.error).toContain('safe integer');
+  // Special case for multipleOf with zero
+  it('should handle multipleOf with zero', () => {
+    const schema = q.number().multipleOf(0);
+    const result = schema.parse(42);
+    expect(result.success).toBe(false);
+    expect(result.error?.code).toBe(NumberErrorCode.MULTIPLE_OF_ZERO);
+    expect(result.error?.message).toContain(
+      NumberErrorMessages[NumberErrorCode.MULTIPLE_OF_ZERO],
+    );
   });
 
   it('should chain multiple constraints', () => {

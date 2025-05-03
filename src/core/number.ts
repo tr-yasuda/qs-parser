@@ -2,15 +2,8 @@
  * Number schema implementation for qs-parser
  * Provides methods for creating and validating number schemas
  */
-
-/**
- * Result of parsing a number
- */
-type NumberParseResult = {
-  success: boolean;
-  value: number;
-  error?: string;
-};
+import { NumberErrorCode, NumberErrorMessages, formatMessage } from './error.js';
+import { NumberParseResult } from './common.js';
 
 /**
  * Constraints for number validation
@@ -78,7 +71,7 @@ type NumberSchema = {
 
   /**
    * Set a less than constraint (exclusive, <)
-   * @param value - The value that the number must be less than
+   * @param value - The value that the number must be lower than
    * @returns A new number schema with the constraint
    */
   lt: (value: number) => NumberSchema;
@@ -151,12 +144,16 @@ type NumberSchema = {
  */
 const validateType = (value: unknown): NumberParseResult => {
   if (typeof value !== 'number' || Number.isNaN(value)) {
+    const message = `${NumberErrorMessages[NumberErrorCode.TYPE]}, got ${typeof value}${
+      typeof value === 'number' && Number.isNaN(value) ? ' (NaN)' : ''
+    }`;
     return {
       success: false,
       value: typeof value === 'number' ? value : 0,
-      error: `Expected number, got ${typeof value}${
-        typeof value === 'number' && Number.isNaN(value) ? ' (NaN)' : ''
-      }`,
+      error: {
+        code: NumberErrorCode.TYPE,
+        message,
+      },
     };
   }
   return { success: true, value };
@@ -173,7 +170,10 @@ const validateMin = (value: number, min?: number): NumberParseResult => {
     return {
       success: false,
       value,
-      error: `Number must be at least ${min}`,
+      error: {
+        code: NumberErrorCode.MIN,
+        message: formatMessage(NumberErrorMessages[NumberErrorCode.MIN], min),
+      },
     };
   }
   return { success: true, value };
@@ -190,7 +190,10 @@ const validateGt = (value: number, gt?: number): NumberParseResult => {
     return {
       success: false,
       value,
-      error: `Number must be greater than ${gt}`,
+      error: {
+        code: NumberErrorCode.GT,
+        message: formatMessage(NumberErrorMessages[NumberErrorCode.GT], gt),
+      },
     };
   }
   return { success: true, value };
@@ -207,7 +210,10 @@ const validateMax = (value: number, max?: number): NumberParseResult => {
     return {
       success: false,
       value,
-      error: `Number must be at most ${max}`,
+      error: {
+        code: NumberErrorCode.MAX,
+        message: formatMessage(NumberErrorMessages[NumberErrorCode.MAX], max),
+      },
     };
   }
   return { success: true, value };
@@ -216,7 +222,7 @@ const validateMax = (value: number, max?: number): NumberParseResult => {
 /**
  * Validate less than constraint (exclusive, <)
  * @param value - The number to validate
- * @param lt - The value that the number must be less than
+ * @param lt - The value that the number must be lower than
  * @returns The validation result
  */
 const validateLt = (value: number, lt?: number): NumberParseResult => {
@@ -224,7 +230,10 @@ const validateLt = (value: number, lt?: number): NumberParseResult => {
     return {
       success: false,
       value,
-      error: `Number must be less than ${lt}`,
+      error: {
+        code: NumberErrorCode.LT,
+        message: formatMessage(NumberErrorMessages[NumberErrorCode.LT], lt),
+      },
     };
   }
   return { success: true, value };
@@ -241,7 +250,10 @@ const validateInt = (value: number, isInt?: boolean): NumberParseResult => {
     return {
       success: false,
       value,
-      error: 'Number must be an integer',
+      error: {
+        code: NumberErrorCode.INT,
+        message: NumberErrorMessages[NumberErrorCode.INT],
+      },
     };
   }
   return { success: true, value };
@@ -261,7 +273,10 @@ const validatePositive = (
     return {
       success: false,
       value,
-      error: 'Number must be positive',
+      error: {
+        code: NumberErrorCode.POSITIVE,
+        message: NumberErrorMessages[NumberErrorCode.POSITIVE],
+      },
     };
   }
   return { success: true, value };
@@ -281,7 +296,10 @@ const validateNonNegative = (
     return {
       success: false,
       value,
-      error: 'Number must be non-negative',
+      error: {
+        code: NumberErrorCode.NON_NEGATIVE,
+        message: NumberErrorMessages[NumberErrorCode.NON_NEGATIVE],
+      },
     };
   }
   return { success: true, value };
@@ -301,7 +319,10 @@ const validateNegative = (
     return {
       success: false,
       value,
-      error: 'Number must be negative',
+      error: {
+        code: NumberErrorCode.NEGATIVE,
+        message: NumberErrorMessages[NumberErrorCode.NEGATIVE],
+      },
     };
   }
   return { success: true, value };
@@ -321,7 +342,10 @@ const validateNonPositive = (
     return {
       success: false,
       value,
-      error: 'Number must be non-positive',
+      error: {
+        code: NumberErrorCode.NON_POSITIVE,
+        message: NumberErrorMessages[NumberErrorCode.NON_POSITIVE],
+      },
     };
   }
   return { success: true, value };
@@ -343,7 +367,10 @@ const validateMultipleOf = (
       return {
         success: false,
         value,
-        error: 'Cannot check for multiples of zero',
+        error: {
+          code: NumberErrorCode.MULTIPLE_OF_ZERO,
+          message: NumberErrorMessages[NumberErrorCode.MULTIPLE_OF_ZERO],
+        },
       };
     }
 
@@ -352,7 +379,13 @@ const validateMultipleOf = (
       return {
         success: false,
         value,
-        error: `Number must be a multiple of ${multipleOf}`,
+        error: {
+          code: NumberErrorCode.MULTIPLE_OF,
+          message: formatMessage(
+            NumberErrorMessages[NumberErrorCode.MULTIPLE_OF],
+            multipleOf,
+          ),
+        },
       };
     }
   }
@@ -362,18 +395,21 @@ const validateMultipleOf = (
 /**
  * Validate finite number constraint
  * @param value - The number to validate
- * @param isFinite - Whether to validate as finite
+ * @param isValueFinite - Whether to validate as finite
  * @returns The validation result
  */
 const validateFinite = (
   value: number,
-  isFinite?: boolean,
+  isValueFinite?: boolean,
 ): NumberParseResult => {
-  if (isFinite && !Number.isFinite(value)) {
+  if (isValueFinite && !Number.isFinite(value)) {
     return {
       success: false,
       value,
-      error: 'Number must be finite',
+      error: {
+        code: NumberErrorCode.FINITE,
+        message: NumberErrorMessages[NumberErrorCode.FINITE],
+      },
     };
   }
   return { success: true, value };
@@ -383,14 +419,17 @@ const validateFinite = (
  * Validate safe integer constraint
  * @param value - The number to validate
  * @param isSafe - Whether to validate as safe integer
- * @returns The validation result
+ * @returns The validations result
  */
 const validateSafe = (value: number, isSafe?: boolean): NumberParseResult => {
   if (isSafe && !Number.isSafeInteger(value)) {
     return {
       success: false,
       value,
-      error: 'Number must be a safe integer',
+      error: {
+        code: NumberErrorCode.SAFE,
+        message: NumberErrorMessages[NumberErrorCode.SAFE],
+      },
     };
   }
   return { success: true, value };

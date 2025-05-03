@@ -2,16 +2,9 @@
  * String schema implementation for qs-parser
  * Provides methods for creating and validating string schemas
  */
-import {ipVersion, isIP} from 'is-ip';
-
-/**
- * Result of parsing a string
- */
-type StringParseResult = {
-  success: boolean;
-  value: string;
-  error?: string;
-};
+import { ipVersion, isIP } from 'is-ip';
+import { StringErrorCode, StringErrorMessages, formatMessage } from './error.js';
+import { StringParseResult } from './common.js';
 
 /**
  * Constraints for string validation
@@ -41,125 +34,24 @@ type StringConstraints = {
  * String schema type
  */
 type StringSchema = {
-  /**
-   * Parse a value as a string
-   * @param value - The value to parse
-   * @returns The parse result
-   */
   parse: (value: unknown) => StringParseResult;
-
-  /**
-   * Set a maximum length constraint
-   * @param length - The maximum allowed length
-   * @returns A new string schema with the constraint
-   */
   max: (length: number) => StringSchema;
-
-  /**
-   * Set a minimum length constraint
-   * @param length - The minimum allowed length
-   * @returns A new string schema with the constraint
-   */
   min: (length: number) => StringSchema;
-
-  /**
-   * Set a pattern constraint
-   * @param regex - The regular expression to match
-   * @returns A new string schema with the constraint
-   */
   pattern: (regex: RegExp) => StringSchema;
-
-  /**
-   * Set an email format constraint
-   * @returns A new string schema with the constraint
-   */
   email: () => StringSchema;
-
-  /**
-   * Set a URL format constraint
-   * @returns A new string schema with the constraint
-   */
   url: () => StringSchema;
-
-  /**
-   * Set an emoji format constraint
-   * @returns A new string schema with the constraint
-   */
   emoji: () => StringSchema;
-
-  /**
-   * Set a UUID format constraint
-   * @returns A new string schema with the constraint
-   */
   uuid: () => StringSchema;
-
-  /**
-   * Set a UUID v4 format constraint
-   * @returns A new string schema with the constraint
-   */
   uuidv4: () => StringSchema;
-
-  /**
-   * Set a UUID v7 format constraint
-   * @returns A new string schema with the constraint
-   */
   uuidv7: () => StringSchema;
-
-  /**
-   * Set a CUID format constraint
-   * @returns A new string schema with the constraint
-   */
   cuid: () => StringSchema;
-
-  /**
-   * Set a CUID2 format constraint
-   * @returns A new string schema with the constraint
-   */
   cuid2: () => StringSchema;
-
-  /**
-   * Set a ULID format constraint
-   * @returns A new string schema with the constraint
-   */
   ulid: () => StringSchema;
-
-  /**
-   * Check if the string includes a substring
-   * @param substring - The substring to check for
-   * @returns A new string schema with the constraint
-   */
   includes: (substring: string) => StringSchema;
-
-  /**
-   * Check if the string starts with a prefix
-   * @param prefix - The prefix to check for
-   * @returns A new string schema with the constraint
-   */
   startsWith: (prefix: string) => StringSchema;
-
-  /**
-   * Check if the string ends with a suffix
-   * @param suffix - The suffix to check for
-   * @returns A new string schema with the constraint
-   */
   endsWith: (suffix: string) => StringSchema;
-
-  /**
-   * Set a datetime format constraint
-   * @returns A new string schema with the constraint
-   */
   datetime: () => StringSchema;
-
-  /**
-   * Set an IP address format constraint
-   * @returns A new string schema with the constraint
-   */
   ip: () => StringSchema;
-
-  /**
-   * Set a CIDR notation format constraint
-   * @returns A new string schema with the constraint
-   */
   cidr: () => StringSchema;
 };
 
@@ -177,7 +69,10 @@ const validateType = (value: unknown): StringParseResult => {
     return {
       success: false,
       value: String(value),
-      error: `Expected string, got ${typeof value}`,
+      error: {
+        code: StringErrorCode.TYPE,
+        message: `${StringErrorMessages[StringErrorCode.TYPE]}, got ${typeof value}`,
+      },
     };
   }
   return { success: true, value };
@@ -197,7 +92,13 @@ const validateMaxLength = (
     return {
       success: false,
       value,
-      error: `String must be at most ${maxLength} characters long`,
+      error: {
+        code: StringErrorCode.MAX_LENGTH,
+        message: formatMessage(
+          StringErrorMessages[StringErrorCode.MAX_LENGTH],
+          maxLength,
+        ),
+      },
     };
   }
   return { success: true, value };
@@ -217,7 +118,13 @@ const validateMinLength = (
     return {
       success: false,
       value,
-      error: `String must be at least ${minLength} characters long`,
+      error: {
+        code: StringErrorCode.MIN_LENGTH,
+        message: formatMessage(
+          StringErrorMessages[StringErrorCode.MIN_LENGTH],
+          minLength,
+        ),
+      },
     };
   }
 
@@ -238,7 +145,13 @@ const validatePattern = (
     return {
       success: false,
       value,
-      error: `String must match pattern ${pattern}`,
+      error: {
+        code: StringErrorCode.PATTERN,
+        message: formatMessage(
+          StringErrorMessages[StringErrorCode.PATTERN],
+          pattern,
+        ),
+      },
     };
   }
   return { success: true, value };
@@ -255,7 +168,10 @@ const validateEmail = (value: string, isEmail?: boolean): StringParseResult => {
     return {
       success: false,
       value,
-      error: 'String must be a valid email address',
+      error: {
+        code: StringErrorCode.EMAIL,
+        message: StringErrorMessages[StringErrorCode.EMAIL],
+      },
     };
   }
   return { success: true, value };
@@ -275,7 +191,10 @@ const validateUrl = (value: string, isUrl?: boolean): StringParseResult => {
       return {
         success: false,
         value,
-        error: 'String must be a valid URL',
+        error: {
+          code: StringErrorCode.URL,
+          message: StringErrorMessages[StringErrorCode.URL],
+        },
       };
     }
   }
@@ -293,7 +212,10 @@ const validateEmoji = (value: string, isEmoji?: boolean): StringParseResult => {
     return {
       success: false,
       value,
-      error: 'String must contain at least one emoji',
+      error: {
+        code: StringErrorCode.EMOJI,
+        message: StringErrorMessages[StringErrorCode.EMOJI],
+      },
     };
   }
   return { success: true, value };
@@ -315,7 +237,10 @@ const validateUuid = (value: string, isUuid?: boolean): StringParseResult => {
     return {
       success: false,
       value,
-      error: 'String must be a valid UUID',
+      error: {
+        code: StringErrorCode.UUID,
+        message: StringErrorMessages[StringErrorCode.UUID],
+      },
     };
   }
   return { success: true, value };
@@ -327,7 +252,10 @@ const validateUuid = (value: string, isUuid?: boolean): StringParseResult => {
  * @param isUuidv4 - Whether to validate as UUID v4
  * @returns The validation result
  */
-const validateUuidv4 = (value: string, isUuidv4?: boolean): StringParseResult => {
+const validateUuidv4 = (
+  value: string,
+  isUuidv4?: boolean,
+): StringParseResult => {
   if (
     isUuidv4 &&
     !/^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/i.test(
@@ -337,7 +265,10 @@ const validateUuidv4 = (value: string, isUuidv4?: boolean): StringParseResult =>
     return {
       success: false,
       value,
-      error: 'String must be a valid UUID v4',
+      error: {
+        code: StringErrorCode.UUID_V4,
+        message: StringErrorMessages[StringErrorCode.UUID_V4],
+      },
     };
   }
   return { success: true, value };
@@ -349,7 +280,10 @@ const validateUuidv4 = (value: string, isUuidv4?: boolean): StringParseResult =>
  * @param isUuidv7 - Whether to validate as UUID v7
  * @returns The validation result
  */
-const validateUuidv7 = (value: string, isUuidv7?: boolean): StringParseResult => {
+const validateUuidv7 = (
+  value: string,
+  isUuidv7?: boolean,
+): StringParseResult => {
   if (
     isUuidv7 &&
     !/^[\da-f]{8}-[\da-f]{4}-7[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/i.test(
@@ -359,7 +293,10 @@ const validateUuidv7 = (value: string, isUuidv7?: boolean): StringParseResult =>
     return {
       success: false,
       value,
-      error: 'String must be a valid UUID v7',
+      error: {
+        code: StringErrorCode.UUID_V7,
+        message: StringErrorMessages[StringErrorCode.UUID_V7],
+      },
     };
   }
   return { success: true, value };
@@ -376,7 +313,10 @@ const validateCuid = (value: string, isCuid?: boolean): StringParseResult => {
     return {
       success: false,
       value,
-      error: 'String must be a valid CUID',
+      error: {
+        code: StringErrorCode.CUID,
+        message: StringErrorMessages[StringErrorCode.CUID],
+      },
     };
   }
   return { success: true, value };
@@ -394,7 +334,10 @@ const validateCuid2 = (value: string, isCuid2?: boolean): StringParseResult => {
     return {
       success: false,
       value,
-      error: 'String must be a valid CUID2',
+      error: {
+        code: StringErrorCode.CUID2,
+        message: StringErrorMessages[StringErrorCode.CUID2],
+      },
     };
   }
   return { success: true, value };
@@ -411,7 +354,10 @@ const validateUlid = (value: string, isUlid?: boolean): StringParseResult => {
     return {
       success: false,
       value,
-      error: 'String must be a valid ULID',
+      error: {
+        code: StringErrorCode.ULID,
+        message: StringErrorMessages[StringErrorCode.ULID],
+      },
     };
   }
   return { success: true, value };
@@ -431,7 +377,13 @@ const validateIncludes = (
     return {
       success: false,
       value,
-      error: `String must include "${includesSubstring}"`,
+      error: {
+        code: StringErrorCode.INCLUDES,
+        message: formatMessage(
+          StringErrorMessages[StringErrorCode.INCLUDES],
+          includesSubstring,
+        ),
+      },
     };
   }
   return { success: true, value };
@@ -451,7 +403,13 @@ const validateStartsWith = (
     return {
       success: false,
       value,
-      error: `String must start with "${startsWithPrefix}"`,
+      error: {
+        code: StringErrorCode.STARTS_WITH,
+        message: formatMessage(
+          StringErrorMessages[StringErrorCode.STARTS_WITH],
+          startsWithPrefix,
+        ),
+      },
     };
   }
   return { success: true, value };
@@ -471,7 +429,13 @@ const validateEndsWith = (
     return {
       success: false,
       value,
-      error: `String must end with "${endsWithSuffix}"`,
+      error: {
+        code: StringErrorCode.ENDS_WITH,
+        message: formatMessage(
+          StringErrorMessages[StringErrorCode.ENDS_WITH],
+          endsWithSuffix,
+        ),
+      },
     };
   }
   return { success: true, value };
@@ -493,7 +457,10 @@ const validateDatetime = (
       return {
         success: false,
         value,
-        error: 'String must be a valid datetime',
+        error: {
+          code: StringErrorCode.DATETIME,
+          message: StringErrorMessages[StringErrorCode.DATETIME],
+        },
       };
     }
   }
@@ -514,7 +481,10 @@ const validateIp = (value: string, isIp?: boolean): StringParseResult => {
       return {
         success: false,
         value,
-        error: 'String must be a valid IP address (IPv4 or IPv6)',
+        error: {
+          code: StringErrorCode.IP,
+          message: StringErrorMessages[StringErrorCode.IP],
+        },
       };
     }
   }
@@ -539,7 +509,11 @@ const validateCidr = (value: string, isCidr?: boolean): StringParseResult => {
       return {
         success: false,
         value,
-        error: 'String must be a valid CIDR notation with a valid IP address',
+        error: {
+          code: StringErrorCode.CIDR,
+          message:
+            'String must be a valid CIDR notation with a valid IP address',
+        },
       };
     }
 
@@ -551,7 +525,13 @@ const validateCidr = (value: string, isCidr?: boolean): StringParseResult => {
       return {
         success: false,
         value,
-        error: `String must be a valid CIDR notation with a prefix length between 0 and ${maxPrefix}`,
+        error: {
+          code: StringErrorCode.CIDR,
+          message: formatMessage(
+            StringErrorMessages[StringErrorCode.CIDR],
+            maxPrefix,
+          ),
+        },
       };
     }
   }
@@ -776,47 +756,47 @@ const string = (): StringSchema => {
       },
 
       max: (length: number): StringSchema => {
-        const updatedConstraints = {...newConstraints, maxLength: length};
+        const updatedConstraints = { ...newConstraints, maxLength: length };
         return createSchemaWithConstraints(updatedConstraints);
       },
 
       min: (length: number): StringSchema => {
-        const updatedConstraints = {...newConstraints, minLength: length};
+        const updatedConstraints = { ...newConstraints, minLength: length };
         return createSchemaWithConstraints(updatedConstraints);
       },
 
       pattern: (regex: RegExp): StringSchema => {
-        const updatedConstraints = {...newConstraints, pattern: regex};
+        const updatedConstraints = { ...newConstraints, pattern: regex };
         return createSchemaWithConstraints(updatedConstraints);
       },
 
       email: (): StringSchema => {
-        const updatedConstraints = {...newConstraints, isEmail: true};
+        const updatedConstraints = { ...newConstraints, isEmail: true };
         return createSchemaWithConstraints(updatedConstraints);
       },
 
       url: (): StringSchema => {
-        const updatedConstraints = {...newConstraints, isUrl: true};
+        const updatedConstraints = { ...newConstraints, isUrl: true };
         return createSchemaWithConstraints(updatedConstraints);
       },
 
       emoji: (): StringSchema => {
-        const updatedConstraints = {...newConstraints, isEmoji: true};
+        const updatedConstraints = { ...newConstraints, isEmoji: true };
         return createSchemaWithConstraints(updatedConstraints);
       },
 
       uuid: (): StringSchema => {
-        const updatedConstraints = {...newConstraints, isUuid: true};
+        const updatedConstraints = { ...newConstraints, isUuid: true };
         return createSchemaWithConstraints(updatedConstraints);
       },
 
       uuidv4: (): StringSchema => {
-        const updatedConstraints = {...newConstraints, isUuidv4: true};
+        const updatedConstraints = { ...newConstraints, isUuidv4: true };
         return createSchemaWithConstraints(updatedConstraints);
       },
 
       uuidv7: (): StringSchema => {
-        const updatedConstraints = {...newConstraints, isUuidv7: true};
+        const updatedConstraints = { ...newConstraints, isUuidv7: true };
         return createSchemaWithConstraints(updatedConstraints);
       },
 
@@ -831,14 +811,14 @@ const string = (): StringSchema => {
       },
 
       ulid: (): StringSchema => {
-        const updatedConstraints = {...newConstraints, isUlid: true};
+        const updatedConstraints = { ...newConstraints, isUlid: true };
         return createSchemaWithConstraints(updatedConstraints);
       },
 
       includes: (substring: string): StringSchema => {
         const updatedConstraints = {
           ...newConstraints,
-          includesSubstring: substring
+          includesSubstring: substring,
         };
         return createSchemaWithConstraints(updatedConstraints);
       },
@@ -846,28 +826,31 @@ const string = (): StringSchema => {
       startsWith: (prefix: string): StringSchema => {
         const updatedConstraints = {
           ...newConstraints,
-          startsWithPrefix: prefix
+          startsWithPrefix: prefix,
         };
         return createSchemaWithConstraints(updatedConstraints);
       },
 
       endsWith: (suffix: string): StringSchema => {
-        const updatedConstraints = {...newConstraints, endsWithSuffix: suffix};
+        const updatedConstraints = {
+          ...newConstraints,
+          endsWithSuffix: suffix,
+        };
         return createSchemaWithConstraints(updatedConstraints);
       },
 
       datetime: (): StringSchema => {
-        const updatedConstraints = {...newConstraints, isDatetime: true};
+        const updatedConstraints = { ...newConstraints, isDatetime: true };
         return createSchemaWithConstraints(updatedConstraints);
       },
 
       ip: (): StringSchema => {
-        const updatedConstraints = {...newConstraints, isIp: true};
+        const updatedConstraints = { ...newConstraints, isIp: true };
         return createSchemaWithConstraints(updatedConstraints);
       },
 
       cidr: (): StringSchema => {
-        const updatedConstraints = {...newConstraints, isCidr: true};
+        const updatedConstraints = { ...newConstraints, isCidr: true };
         return createSchemaWithConstraints(updatedConstraints);
       },
     };
