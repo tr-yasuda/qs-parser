@@ -50,7 +50,7 @@ export const validateType = (value: unknown): DateParseResult => {
       value: value as unknown as Date,
       error: {
         code: DateErrorCode.TYPE,
-        message: `${DateErrorMessages[DateErrorCode.TYPE]}, got ${typeof value}`,
+        message: `${DateErrorMessages[DateErrorCode.TYPE]}, got ${typeof value}. Expected a Date object or a string in 'YYYY-MM-DD' format`,
       },
     };
   }
@@ -62,7 +62,7 @@ export const validateType = (value: unknown): DateParseResult => {
       value: value as Date, // Original value preserved without coercion
       error: {
         code: DateErrorCode.TYPE,
-        message: `${DateErrorMessages[DateErrorCode.TYPE]}, got ${typeof value}`,
+        message: `${DateErrorMessages[DateErrorCode.TYPE]}, got ${typeof value}. Expected a Date object or a string in 'YYYY-MM-DD' format`,
       },
     };
   }
