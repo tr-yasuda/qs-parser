@@ -39,7 +39,12 @@ const object = (shape?: Record<string, unknown>): ObjectSchema => {
     },
 
     strict: function () {
-      const newSchema = Object.create(this);
+      const newSchema = {
+        ...this,
+        _shapeDefinition: this._shapeDefinition
+          ? { ...this._shapeDefinition }
+          : null,
+      };
       newSchema._isStrict = true;
       return newSchema;
     },
