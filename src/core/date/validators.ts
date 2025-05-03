@@ -100,7 +100,7 @@ export const validateMax = (value: Date, maxDate?: Date): DateParseResult => {
  * Validate past date constraint (< now)
  * @param value - The date to validate
  * @param isPast - Whether to validate as past date
- * @returns The validation result
+ * @returns The validations result
  */
 export const validatePast = (
   value: Date,
@@ -126,7 +126,7 @@ export const validatePast = (
  * Validate future date constraint (> now)
  * @param value - The date to validate
  * @param isFuture - Whether to validate as future date
- * @returns The validation result
+ * @returns The validations result
  */
 export const validateFuture = (
   value: Date,
@@ -160,7 +160,27 @@ export const validateBetween = (
 ): DateParseResult => {
   if (betweenDates !== undefined) {
     const [min, max] = betweenDates;
-    if (value < min || value > max) {
+
+    // Check if the value is less than min
+    const minResult = validateMin(value, min);
+    if (!minResult.success) {
+      return {
+        success: false,
+        value,
+        error: {
+          code: DateErrorCode.BETWEEN,
+          message: formatMessage(
+            DateErrorMessages[DateErrorCode.BETWEEN],
+            min.toISOString(),
+            max.toISOString(),
+          ),
+        },
+      };
+    }
+
+    // Check if the value is greater than max
+    const maxResult = validateMax(value, max);
+    if (!maxResult.success) {
       return {
         success: false,
         value,
@@ -179,6 +199,27 @@ export const validateBetween = (
 };
 
 /**
+ * Extract the date part (year, month, day) from a Date object
+ * @param date - The date to extract from
+ * @returns A new Date object with only the year, month, and day components
+ */
+const extractDatePart = (date: Date): Date => {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+};
+
+/**
+ * Check if two dates are the same day
+ * @param date1 - The first date
+ * @param date2 - The second date
+ * @returns True if the dates are the same day, false otherwise
+ */
+const isSameDay = (date1: Date, date2: Date): boolean => {
+  const day1 = extractDatePart(date1);
+  const day2 = extractDatePart(date2);
+  return day1.getTime() === day2.getTime();
+};
+
+/**
  * Validate today constraint (same day as now)
  * @param value - The date to validate
  * @param isToday - Whether to validate as today
@@ -190,14 +231,7 @@ export const validateToday = (
 ): DateParseResult => {
   if (isToday) {
     const now = new Date();
-    const valueDay = new Date(
-      value.getFullYear(),
-      value.getMonth(),
-      value.getDate(),
-    );
-    const nowDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-    if (valueDay.getTime() !== nowDay.getTime()) {
+    if (!isSameDay(value, now)) {
       return {
         success: false,
         value,
