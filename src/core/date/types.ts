@@ -27,6 +27,9 @@ export type DateSchema = {
    *   - success: true if validation passed, false otherwise
    *   - value: the original input value (preserved without coercion in error cases)
    *   - error: validation error details if success is false
+   * @remarks
+   * IMPORTANT: When passing a string as input, only the 'YYYY-MM-DD' format (e.g., '2023-01-31') is supported.
+   * Other date formats will result in validation errors.
    */
   parse: (value: unknown) => DateParseResult;
 

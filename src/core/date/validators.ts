@@ -11,6 +11,10 @@ import { DateErrorCode, DateErrorMessages, formatMessage } from '../error.js';
  *          If the value is a string in YYYY-MM-DD format, it will be parsed into a Date.
  *          Note: The type assertion (value as unknown as Date) does not perform any transformation
  *          at runtime; it only informs TypeScript about the expected type.
+ * @remarks
+ * IMPORTANT: This validator only accepts string dates in the 'YYYY-MM-DD' format (e.g., '2023-01-31').
+ * Other date formats like 'MM/DD/YYYY', 'DD-MM-YYYY', or ISO date strings with time components
+ * are not supported and will result in validation errors.
  */
 export const validateType = (value: unknown): DateParseResult => {
   // If the value is a string, try to parse it as a Date

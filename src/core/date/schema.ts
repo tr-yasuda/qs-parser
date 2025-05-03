@@ -9,6 +9,9 @@ import * as validators from './validators.js';
 /**
  * Create a date schema
  * @returns A new date schema
+ * @remarks
+ * IMPORTANT: When validating string inputs, only the 'YYYY-MM-DD' format (e.g., '2023-01-31') is supported.
+ * Other date formats will result in validation errors.
  */
 const date = (): DateSchema => {
   // Store constraints
