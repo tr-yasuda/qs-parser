@@ -153,7 +153,7 @@ const validateType = (value: unknown): NumberParseResult => {
     }`;
     return {
       success: false,
-      value: typeof value === 'number' ? value : 0,
+      value: value as number, // Return the original value without coercion
       error: {
         code: NumberErrorCode.TYPE,
         message,

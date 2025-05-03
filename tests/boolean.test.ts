@@ -17,40 +17,50 @@ describe('boolean schema', () => {
     expect(result2.value).toBe(false);
 
     // Non-boolean value (string)
-    const result3 = schema.parse('true');
+    const stringValue = 'true';
+    const result3 = schema.parse(stringValue);
     expect(result3.success).toBe(false);
+    expect(result3.value).toBe(stringValue); // Original value is preserved
     expect(result3.error?.message).toContain(
       BooleanErrorMessages[BooleanErrorCode.TYPE],
     );
     expect(result3.error?.code).toBe(BooleanErrorCode.TYPE);
 
     // Non-boolean value (number)
-    const result4 = schema.parse(1);
+    const numberValue = 1;
+    const result4 = schema.parse(numberValue);
     expect(result4.success).toBe(false);
+    expect(result4.value).toBe(numberValue); // Original value is preserved
     expect(result4.error?.message).toContain(
       BooleanErrorMessages[BooleanErrorCode.TYPE],
     );
     expect(result4.error?.code).toBe(BooleanErrorCode.TYPE);
 
     // Non-boolean value (object)
-    const result5 = schema.parse({});
+    const objectValue = {};
+    const result5 = schema.parse(objectValue);
     expect(result5.success).toBe(false);
+    expect(result5.value).toBe(objectValue); // Original value is preserved
     expect(result5.error?.message).toContain(
       BooleanErrorMessages[BooleanErrorCode.TYPE],
     );
     expect(result5.error?.code).toBe(BooleanErrorCode.TYPE);
 
     // Non-boolean value (null)
-    const result6 = schema.parse(null);
+    const nullValue = null;
+    const result6 = schema.parse(nullValue);
     expect(result6.success).toBe(false);
+    expect(result6.value).toBe(nullValue); // Original value is preserved
     expect(result6.error?.message).toContain(
       BooleanErrorMessages[BooleanErrorCode.TYPE],
     );
     expect(result6.error?.code).toBe(BooleanErrorCode.TYPE);
 
     // Non-boolean value (undefined)
-    const result7 = schema.parse(undefined);
+    const undefinedValue = undefined;
+    const result7 = schema.parse(undefinedValue);
     expect(result7.success).toBe(false);
+    expect(result7.value).toBe(undefinedValue); // Original value is preserved
     expect(result7.error?.message).toContain(
       BooleanErrorMessages[BooleanErrorCode.TYPE],
     );

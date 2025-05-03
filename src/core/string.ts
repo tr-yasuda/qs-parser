@@ -72,7 +72,7 @@ const validateType = (value: unknown): StringParseResult => {
   if (typeof value !== 'string') {
     return {
       success: false,
-      value: String(value),
+      value: value as string, // Return the original value without coercion
       error: {
         code: StringErrorCode.TYPE,
         message: `${StringErrorMessages[StringErrorCode.TYPE]}, got ${typeof value}`,

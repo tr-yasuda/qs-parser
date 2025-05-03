@@ -21,7 +21,7 @@ const validateType = (value: unknown): BooleanParseResult => {
   if (typeof value !== 'boolean') {
     return {
       success: false,
-      value: Boolean(value),
+      value: value as boolean, // Return the original value without coercion
       error: {
         code: BooleanErrorCode.TYPE,
         message: `${BooleanErrorMessages[BooleanErrorCode.TYPE]}, got ${typeof value}`,
