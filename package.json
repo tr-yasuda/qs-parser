@@ -1,0 +1,22 @@
+{
+  "name": "qs-parser",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "A query string parser",
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@tsconfig/node22": "^22.0.1",
+    "@types/node": "^22.15.3",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.2"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "lint": "biome check",
+    "format": "biome check --write",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "is-ip": "^5.0.1"
+  }
+}
