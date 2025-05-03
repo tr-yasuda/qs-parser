@@ -48,7 +48,7 @@ export const validateShape = (
   strict = false,
 ): ObjectParseResult => {
   // Check for required keys
-  for (const key in shape) {
+  for (const key of Object.keys(shape)) {
     if (!(key in value)) {
       return {
         success: false,
