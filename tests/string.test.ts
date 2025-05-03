@@ -357,6 +357,159 @@ describe('string schema', () => {
     );
   });
 
+  it('should validate date', () => {
+    const schema = q.string().date();
+
+    // Valid date
+    const result1 = schema.parse('2023-01-01');
+    expect(result1.success).toBe(true);
+
+    // Invalid date format
+    const result2 = schema.parse('01/01/2023');
+    expect(result2.success).toBe(false);
+    expect(result2.error?.message).toContain(
+      StringErrorMessages[StringErrorCode.DATE],
+    );
+    expect(result2.error?.code).toBe(StringErrorCode.DATE);
+
+    // Invalid date value
+    const result3 = schema.parse('2023-13-01');
+    expect(result3.success).toBe(false);
+    expect(result3.error?.message).toContain(
+      StringErrorMessages[StringErrorCode.DATE],
+    );
+    expect(result3.error?.code).toBe(StringErrorCode.DATE);
+  });
+
+  it('should validate time', () => {
+    const schema = q.string().time();
+
+    // Valid time
+    const result1 = schema.parse('12:30:45');
+    expect(result1.success).toBe(true);
+
+    // Invalid time format
+    const result2 = schema.parse('12:30');
+    expect(result2.success).toBe(false);
+    expect(result2.error?.message).toContain(
+      StringErrorMessages[StringErrorCode.TIME],
+    );
+    expect(result2.error?.code).toBe(StringErrorCode.TIME);
+
+    // Invalid time value
+    const result3 = schema.parse('25:30:45');
+    expect(result3.success).toBe(false);
+    expect(result3.error?.message).toContain(
+      StringErrorMessages[StringErrorCode.TIME],
+    );
+    expect(result3.error?.code).toBe(StringErrorCode.TIME);
+  });
+
+  it('should validate duration', () => {
+    const schema = q.string().duration();
+
+    // Valid durations
+    const result1 = schema.parse('PT1H30M');
+    expect(result1.success).toBe(true);
+
+    const result2 = schema.parse('PT10S');
+    expect(result2.success).toBe(true);
+
+    const result3 = schema.parse('PT1H30M10S');
+    expect(result3.success).toBe(true);
+
+    // Invalid duration format
+    const result4 = schema.parse('1h30m');
+    expect(result4.success).toBe(false);
+    expect(result4.error?.message).toContain(
+      StringErrorMessages[StringErrorCode.DURATION],
+    );
+    expect(result4.error?.code).toBe(StringErrorCode.DURATION);
+
+    // Empty duration
+    const result5 = schema.parse('PT');
+    expect(result5.success).toBe(false);
+    expect(result5.error?.message).toContain(
+      StringErrorMessages[StringErrorCode.DURATION],
+    );
+    expect(result5.error?.code).toBe(StringErrorCode.DURATION);
+  });
+
+  it('should validate base64', () => {
+    const schema = q.string().base64();
+
+    // Valid base64
+    const result1 = schema.parse('SGVsbG8gV29ybGQ=');
+    expect(result1.success).toBe(true);
+
+    // Invalid base64 characters
+    const result2 = schema.parse('SGVsbG8gV29ybGQ!');
+    expect(result2.success).toBe(false);
+    expect(result2.error?.message).toContain(
+      StringErrorMessages[StringErrorCode.BASE64],
+    );
+    expect(result2.error?.code).toBe(StringErrorCode.BASE64);
+
+    // Invalid base64 length (not a multiple of 4)
+    const result3 = schema.parse('SGVsbG8gV29ybG');
+    expect(result3.success).toBe(false);
+    expect(result3.error?.message).toContain(
+      StringErrorMessages[StringErrorCode.BASE64],
+    );
+    expect(result3.error?.code).toBe(StringErrorCode.BASE64);
+  });
+
+  it('should trim strings', () => {
+    const schema = q.string().trim();
+
+    // String with whitespace
+    const result = schema.parse('  hello world  ');
+    expect(result.success).toBe(true);
+    expect(result.value).toBe('hello world');
+
+    // String without whitespace
+    const result2 = schema.parse('hello');
+    expect(result2.success).toBe(true);
+    expect(result2.value).toBe('hello');
+  });
+
+  it('should convert strings to lowercase', () => {
+    const schema = q.string().toLowerCase();
+
+    // Mixed case string
+    const result = schema.parse('Hello World');
+    expect(result.success).toBe(true);
+    expect(result.value).toBe('hello world');
+
+    // Already lowercase
+    const result2 = schema.parse('hello');
+    expect(result2.success).toBe(true);
+    expect(result2.value).toBe('hello');
+  });
+
+  it('should convert strings to uppercase', () => {
+    const schema = q.string().toUpperCase();
+
+    // Mixed case string
+    const result = schema.parse('Hello World');
+    expect(result.success).toBe(true);
+    expect(result.value).toBe('HELLO WORLD');
+
+    // Already uppercase
+    const result2 = schema.parse('HELLO');
+    expect(result2.success).toBe(true);
+    expect(result2.value).toBe('HELLO');
+  });
+
+  it('should chain transformation methods', () => {
+    const schema = q.string().trim().toLowerCase();
+
+    // String with whitespace and mixed case
+    const result = schema.parse('  Hello World  ');
+    expect(result.success).toBe(true);
+    expect(result.value).toBe('hello world');
+  });
+
   it('should chain multiple constraints', () => {
     const minLength = 5;
     const maxLength = 10;
