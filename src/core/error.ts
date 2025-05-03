@@ -54,8 +54,8 @@ export enum StringErrorCode {
   URL = 'string.url',
   EMOJI = 'string.emoji',
   UUID = 'string.uuid',
-  UUID_V4 = 'string.uuidv4',
-  UUID_V7 = 'string.uuidv7',
+  UUID_V4 = 'string.uuidV4',
+  UUID_V7 = 'string.uuidV7',
   CUID = 'string.cuid',
   CUID2 = 'string.cuid2',
   ULID = 'string.ulid',
@@ -150,6 +150,24 @@ export const NumberErrorMessages = {
 export type ValidationError = {
   code: string;
   message: string;
+};
+
+/**
+ * Error codes for object validation
+ */
+export enum ObjectErrorCode {
+  TYPE = 'object.type',
+  REQUIRED = 'object.required',
+  UNKNOWN_KEYS = 'object.unknownKeys',
+}
+
+/**
+ * Error messages for object validation
+ */
+export const ObjectErrorMessages = {
+  [ObjectErrorCode.TYPE]: 'Expected object',
+  [ObjectErrorCode.REQUIRED]: 'Required key "{0}" is missing',
+  [ObjectErrorCode.UNKNOWN_KEYS]: 'Unknown key(s): {0}',
 };
 
 /**
