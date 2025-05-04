@@ -52,6 +52,13 @@ export type ObjectSchema = {
   _isStrict: boolean;
 
   /**
+   * Internal constraints for object validation
+   * This property is added dynamically and may not be present on all instances
+   * @internal
+   */
+  _constraints?: ObjectConstraints;
+
+  /**
    * Makes the schema accept undefined values
    * @returns A new schema that accepts undefined values
    */

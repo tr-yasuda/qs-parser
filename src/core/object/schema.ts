@@ -85,20 +85,33 @@ const object = (
       };
       newSchema._isStrict = true;
 
-      // Update constraints with the new error message if provided
+      // Create a new constraints object to avoid mutating the shared one
       // This custom message will be used specifically for unknown keys validation errors
+      const newConstraints = { ...constraints };
       if (options?.message) {
-        constraints.unknownKeysErrorMessage = options.message;
+        newConstraints.unknownKeysErrorMessage = options.message;
       }
+
+      // Store the new constraints in the schema
+      Object.defineProperty(newSchema, '_constraints', {
+        value: newConstraints,
+        writable: true,
+        enumerable: false,
+        configurable: true,
+      });
 
       return newSchema;
     },
 
     parse: function (value: unknown): ObjectParseResult {
+      // Use instance-specific constraints if available,
+      // otherwise use shared constraints
+      const effectiveConstraints = this._constraints || constraints;
+
       // Validate that the value is an object
       const typeResult = validators.validateType(
         value,
-        constraints.customErrorMessage,
+        effectiveConstraints.customErrorMessage,
       );
       if (!typeResult.success) {
         return typeResult;
@@ -110,8 +123,8 @@ const object = (
           typeResult.value,
           this._shapeDefinition,
           this._isStrict,
-          constraints.requiredErrorMessage,
-          constraints.unknownKeysErrorMessage,
+          effectiveConstraints.requiredErrorMessage,
+          effectiveConstraints.unknownKeysErrorMessage,
         );
       }
 
