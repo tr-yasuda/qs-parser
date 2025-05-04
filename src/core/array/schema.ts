@@ -107,10 +107,10 @@ const array = (itemSchemaOrOptions?: unknown): ArraySchema => {
        * @example
        * // Set exact length of 5 with custom error message
        * q.array().length(5, { message: 'Array must have exactly 5 items' })
-       * 
+       *
        * // Set length between 2 and 10
        * q.array().length(2, 10)
-       * 
+       *
        * // Set length between 2 and 10 with custom error message
        * q.array().length(2, 10, { message: 'Array length must be between 2 and 10' })
        */
