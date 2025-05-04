@@ -4,13 +4,34 @@
 import type { ObjectParseResult } from '../common/index.js';
 
 /**
+ * Options for object schema creation
+ */
+export type ObjectSchemaOptions = {
+  /**
+   * Custom error message to use when validation fails
+   */
+  message?: string;
+};
+
+/**
+ * Options for validation methods
+ */
+export type ValidationOptions = {
+  /**
+   * Custom error message to use when validation fails
+   */
+  message?: string;
+};
+
+/**
  * Function to create an object schema
  * @param shape - Optional shape definition for the object
+ * @param options - Optional configuration options for the schema
  * @returns A new object schema
  */
 export type ObjectSchemaCreator = {
-  (): ObjectSchema;
-  (shape: Record<string, unknown>): ObjectSchema;
+  (options?: ObjectSchemaOptions): ObjectSchema;
+  (shape: Record<string, unknown>, options?: ObjectSchemaOptions): ObjectSchema;
 };
 
 /**
@@ -29,6 +50,13 @@ export type ObjectSchema = {
    * @internal
    */
   _isStrict: boolean;
+
+  /**
+   * Internal constraints for object validation
+   * This property is added dynamically and may not be present on all instances
+   * @internal
+   */
+  _constraints?: ObjectConstraints;
 
   /**
    * Makes the schema accept undefined values
@@ -60,9 +88,10 @@ export type ObjectSchema = {
 
   /**
    * Specifies that the object should not contain any keys not defined in the shape
+   * @param options - Optional validation options
    * @returns A new schema that rejects objects with unknown keys
    */
-  strict: () => ObjectSchema;
+  strict: (options?: ValidationOptions) => ObjectSchema;
 
   /**
    * Parse and validate a value as an object
@@ -73,6 +102,24 @@ export type ObjectSchema = {
    *   - error: validation error details if success is false
    */
   parse: (value: unknown) => ObjectParseResult;
+};
+
+/**
+ * Constraints for object validation
+ */
+export type ObjectConstraints = {
+  /**
+   * Custom error message to use when type validation fails
+   */
+  customErrorMessage?: string;
+  /**
+   * Custom error message to use when required key validation fails
+   */
+  requiredErrorMessage?: string;
+  /**
+   * Custom error message to use when unknown keys validation fails
+   */
+  unknownKeysErrorMessage?: string;
 };
 
 /**

@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { DateErrorCode, DateErrorMessages } from '../src/core/error.js';
-import { q } from '../src/index.js';
-import { formatMessage } from './helper.js';
+import {
+  DateErrorCode,
+  DateErrorMessages,
+  formatMessage,
+} from '../../src/core/error.js';
+import { q } from '../../src/index.js';
 
 // Helper functions for date creation
 const createDateWithTime = (
@@ -19,7 +22,7 @@ const createDateWithTime = (
 const createTestDates = () => {
   const now = new Date();
 
-  // Create a date 30 days ago
+  // Created a date 30 days ago
   const minDate = new Date(now);
   minDate.setDate(now.getDate() - 30);
 
@@ -27,7 +30,7 @@ const createTestDates = () => {
   const maxDate = new Date(now);
   maxDate.setDate(now.getDate() - 1);
 
-  // Create a date 15 days ago (valid date between min and max)
+  // Created a date 15 days ago (valid date between min and max)
   const validDate = new Date(now);
   validDate.setDate(now.getDate() - 15);
 
@@ -35,7 +38,7 @@ const createTestDates = () => {
   const futureDate = new Date(now);
   futureDate.setDate(now.getDate() + 1);
 
-  // Create a date 31 days ago (before min date)
+  // Created a date 31 days ago (before min date)
   const tooOldDate = new Date(now);
   tooOldDate.setDate(now.getDate() - 31);
 
@@ -95,7 +98,7 @@ describe('date schema', () => {
       expect(result2.success).toBe(false);
       expect(result2.error?.code).toBe(DateErrorCode.TYPE);
 
-      // Month edge dates
+      // Month-edge dates
       const monthEndDates = [
         '2023-01-31', // January has 31 days
         '2023-04-30', // April has 30 days
@@ -130,7 +133,7 @@ describe('date schema', () => {
     it('should handle Date objects with time components', () => {
       const schema = q.date();
 
-      // Date with time component
+      // Date with a time component
       const dateWithTime = createDateWithTime(2023, 1, 1, 12, 30, 45);
       const result = schema.parse(dateWithTime);
       expect(result.success).toBe(true);
@@ -157,7 +160,7 @@ describe('date schema', () => {
       expect(result2.success).toBe(true);
 
       // Date before Unix epoch
-      const beforeEpochDate = new Date(-1000 * 60 * 60 * 24 * 365); // Roughly 1 year before epoch
+      const beforeEpochDate = new Date(-1000 * 60 * 60 * 24 * 365); // Roughly 1 year before the epoch
       const result3 = schema.parse(beforeEpochDate);
       expect(result3.success).toBe(true);
     });
@@ -213,7 +216,7 @@ describe('date schema', () => {
       // JavaScript can handle dates from -271821-04-20 to 275760-09-13
       // Testing near the boundaries
 
-      // Valid dates near boundaries (using Date objects since string format is limited)
+      // Valid dates near boundaries (using Date objects since a string format is limited)
       const earlyDate = new Date(-271821, 3, 20); // April 20, -271821
       const farFutureDate = new Date(275760, 8, 13); // September 13, 275760
 

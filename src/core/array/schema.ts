@@ -11,7 +11,9 @@ import { createSchemaWithConstraints } from '../utils/schema.js';
 import type {
   ArrayConstraints,
   ArraySchema,
+  ArraySchemaOptions,
   ParseableSchema,
+  ValidationOptions,
 } from './types.js';
 import * as validators from './validators.js';
 
@@ -27,12 +29,30 @@ const isParseable = (value: unknown): value is ParseableSchema => {
 
 /**
  * Create an array schema
- * @param itemSchema - Optional schema for array items
+ * @param itemSchemaOrOptions - Optional schema for array items or options
  * @returns A new array schema
  */
-const array = (itemSchema?: unknown): ArraySchema => {
+const array = (itemSchemaOrOptions?: unknown): ArraySchema => {
+  // Determine if the first argument is options or an item schema
+  let itemSchema: unknown = undefined;
+  let options: ArraySchemaOptions | undefined = undefined;
+
+  if (
+    itemSchemaOrOptions !== undefined &&
+    typeof itemSchemaOrOptions === 'object' &&
+    itemSchemaOrOptions !== null &&
+    !Array.isArray(itemSchemaOrOptions) &&
+    'message' in itemSchemaOrOptions
+  ) {
+    options = itemSchemaOrOptions as ArraySchemaOptions;
+  } else {
+    itemSchema = itemSchemaOrOptions;
+  }
+
   // Store constraints
-  const constraints: ArrayConstraints = {};
+  const constraints: ArrayConstraints = {
+    customErrorMessage: options?.message,
+  };
 
   // Helper function to create a new schema with updated constraints
   const createArraySchema = (
@@ -56,35 +76,83 @@ const array = (itemSchema?: unknown): ArraySchema => {
         return makeDefault(this, defaultValue);
       },
 
-      min: (length: number): ArraySchema =>
+      min: (length: number, options?: ValidationOptions): ArraySchema =>
         createSchemaWithConstraints(
-          { ...newConstraints, minLength: length },
+          {
+            ...newConstraints,
+            minLength: length,
+            minLengthErrorMessage: options?.message,
+          },
           createArraySchema,
         ),
 
-      max: (length: number): ArraySchema =>
+      max: (length: number, options?: ValidationOptions): ArraySchema =>
         createSchemaWithConstraints(
-          { ...newConstraints, maxLength: length },
+          {
+            ...newConstraints,
+            maxLength: length,
+            maxLengthErrorMessage: options?.message,
+          },
           createArraySchema,
         ),
 
-      length: (min: number, max?: number): ArraySchema => {
-        if (max === undefined) {
-          // If max is not provided, set both min and max to the same value
-          return createSchemaWithConstraints(
-            { ...newConstraints, minLength: min, maxLength: min },
-            createArraySchema,
-          );
-        }
+      /**
+       * Sets both minimum and maximum length for the array
+       * @param min - The minimum length
+       * @param maxOrOptions - Either the maximum length or validation options.
+       *                       If a number, it sets the maximum length.
+       *                       If an object, it provides validation options and min=max (exact length).
+       * @param optionsParam - Validation options when maxOrOptions is a number
+       * @returns A new schema with the length constraints
+       * @example
+       * // Set exact length of 5 with custom error message
+       * q.array().length(5, { message: 'Array must have exactly 5 items' })
+       *
+       * // Set length between 2 and 10
+       * q.array().length(2, 10)
+       *
+       * // Set length between 2 and 10 with custom error message
+       * q.array().length(2, 10, { message: 'Array length must be between 2 and 10' })
+       */
+      length: (
+        min: number,
+        maxOrOptions?: number | ValidationOptions,
+        optionsParam?: ValidationOptions,
+      ): ArraySchema => {
+        // There are two ways to call this method:
+        // 1. length(exactLength, options?) - Sets min and max to the same value
+        // 2. length(min, max, options?) - Sets different min and max values
+
+        // Determine if the second argument is a validation options object
+        const isMaxOptions = typeof maxOrOptions === 'object';
+
+        // Get the validation options from either the second or third argument
+        const validationOptions = isMaxOptions ? maxOrOptions : optionsParam;
+
+        // Determine the max value:
+        // - If maxOrOptions is a number, use it as max
+        // - Otherwise, use min as both min and max (exact length)
+        const max = typeof maxOrOptions === 'number' ? maxOrOptions : min;
+
+        // Create a new schema with the constraints
         return createSchemaWithConstraints(
-          { ...newConstraints, minLength: min, maxLength: max },
+          {
+            ...newConstraints,
+            minLength: min,
+            maxLength: max,
+            minLengthErrorMessage: validationOptions?.message,
+            maxLengthErrorMessage: validationOptions?.message,
+          },
           createArraySchema,
         );
       },
 
       parse: function (value: unknown): ArrayParseResult {
         // Validate that the value is an array
-        const typeResult = validators.validateType(value);
+        const typeResult = validators.validateType(
+          value,
+          this._constraints.customErrorMessage,
+        );
         if (!typeResult.success) {
           return typeResult;
         }
@@ -96,6 +164,7 @@ const array = (itemSchema?: unknown): ArraySchema => {
         const minLengthResult = validators.validateMinLength(
           arrayValue,
           this._constraints.minLength,
+          this._constraints.minLengthErrorMessage,
         );
         if (!minLengthResult.success) {
           return minLengthResult;
@@ -104,6 +173,7 @@ const array = (itemSchema?: unknown): ArraySchema => {
         const maxLengthResult = validators.validateMaxLength(
           arrayValue,
           this._constraints.maxLength,
+          this._constraints.maxLengthErrorMessage,
         );
         if (!maxLengthResult.success) {
           return maxLengthResult;

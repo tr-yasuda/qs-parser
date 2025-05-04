@@ -5,6 +5,26 @@
 import type { StringParseResult } from '../common/index.js';
 
 /**
+ * Options for string schema creation
+ */
+export type StringSchemaOptions = {
+  /**
+   * Custom error message to use when validation fails
+   */
+  message?: string;
+};
+
+/**
+ * Options for validation methods
+ */
+export type ValidationOptions = {
+  /**
+   * Custom error message to use when validation fails
+   */
+  message?: string;
+};
+
+/**
  * Constraints for string validation
  */
 export type StringConstraints = {
@@ -33,6 +53,31 @@ export type StringConstraints = {
   trim?: boolean;
   toLowerCase?: boolean;
   toUpperCase?: boolean;
+  /**
+   * Custom error message to use when type validation fails
+   */
+  customErrorMessage?: string;
+  /**
+   * Custom error message to use when min length validation fails
+   */
+  minLengthErrorMessage?: string;
+  /**
+   * Custom error message to use when max length validation fails
+   */
+  maxLengthErrorMessage?: string;
+  /**
+   * Custom error message to use when pattern validation fails
+   */
+  patternErrorMessage?: string;
+  /**
+   * Custom error message to use when email validation fails
+   */
+  emailErrorMessage?: string;
+  /**
+   * Custom error message to use when URL validation fails
+   */
+  urlErrorMessage?: string;
+  // Add more custom error messages for other validations as needed
 };
 
 /**
@@ -76,11 +121,11 @@ export type StringSchema = {
    *   - error: validation error details if success is false
    */
   parse: (value: unknown) => StringParseResult;
-  max: (length: number) => StringSchema;
-  min: (length: number) => StringSchema;
-  pattern: (regex: RegExp) => StringSchema;
-  email: () => StringSchema;
-  url: () => StringSchema;
+  max: (length: number, options?: ValidationOptions) => StringSchema;
+  min: (length: number, options?: ValidationOptions) => StringSchema;
+  pattern: (regex: RegExp, options?: ValidationOptions) => StringSchema;
+  email: (options?: ValidationOptions) => StringSchema;
+  url: (options?: ValidationOptions) => StringSchema;
   emoji: () => StringSchema;
   uuid: () => StringSchema;
   uuidV4: () => StringSchema;

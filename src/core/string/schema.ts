@@ -9,16 +9,24 @@ import {
 } from '../common/schema.js';
 import { createSchemaWithConstraints } from '../utils/schema.js';
 import * as processors from './processors.js';
-import type { StringConstraints, StringSchema } from './types.js';
+import type {
+  StringConstraints,
+  StringSchema,
+  StringSchemaOptions,
+  ValidationOptions,
+} from './types.js';
 import * as validators from './validators.js';
 
 /**
  * Create a string schema
+ * @param options - Optional configuration options for the schema
  * @returns A new string schema
  */
-const string = (): StringSchema => {
+const string = (options?: StringSchemaOptions): StringSchema => {
   // Store constraints
-  const constraints: StringConstraints = {};
+  const constraints: StringConstraints = {
+    customErrorMessage: options?.message,
+  };
 
   // Helper function to create a new schema with updated constraints
   const createStringSchema = (
@@ -40,7 +48,10 @@ const string = (): StringSchema => {
 
       parse: (value: unknown): StringParseResult => {
         // First, validate that the value is a string
-        const typeResult = validators.validateType(value);
+        const typeResult = validators.validateType(
+          value,
+          newConstraints.customErrorMessage,
+        );
         if (!typeResult.success) {
           return typeResult;
         }
@@ -61,11 +72,31 @@ const string = (): StringSchema => {
 
         // Validate each constraint with the new constraints
         const validations = [
-          validators.validateMaxLength(stringValue, newConstraints.maxLength),
-          validators.validateMinLength(stringValue, newConstraints.minLength),
-          validators.validatePattern(stringValue, newConstraints.pattern),
-          validators.validateEmail(stringValue, newConstraints.isEmail),
-          validators.validateUrl(stringValue, newConstraints.isUrl),
+          validators.validateMaxLength(
+            stringValue,
+            newConstraints.maxLength,
+            newConstraints.maxLengthErrorMessage,
+          ),
+          validators.validateMinLength(
+            stringValue,
+            newConstraints.minLength,
+            newConstraints.minLengthErrorMessage,
+          ),
+          validators.validatePattern(
+            stringValue,
+            newConstraints.pattern,
+            newConstraints.patternErrorMessage,
+          ),
+          validators.validateEmail(
+            stringValue,
+            newConstraints.isEmail,
+            newConstraints.emailErrorMessage,
+          ),
+          validators.validateUrl(
+            stringValue,
+            newConstraints.isUrl,
+            newConstraints.urlErrorMessage,
+          ),
           validators.validateEmoji(stringValue, newConstraints.isEmoji),
           validators.validateUuid(stringValue, newConstraints.isUuid),
           validators.validateUuidV4(stringValue, newConstraints.isUuidV4),
@@ -108,49 +139,57 @@ const string = (): StringSchema => {
         };
       },
 
-      max: (length: number): StringSchema => {
+      max: (length: number, options?: ValidationOptions): StringSchema => {
         return createSchemaWithConstraints(
           {
             ...newConstraints,
             maxLength: length,
+            maxLengthErrorMessage: options?.message,
           },
           createStringSchema,
         );
       },
 
-      min: (length: number): StringSchema => {
+      min: (length: number, options?: ValidationOptions): StringSchema => {
         return createSchemaWithConstraints(
           {
             ...newConstraints,
             minLength: length,
+            minLengthErrorMessage: options?.message,
           },
           createStringSchema,
         );
       },
 
-      pattern: (regex: RegExp): StringSchema => {
+      pattern: (regex: RegExp, options?: ValidationOptions): StringSchema => {
         return createSchemaWithConstraints(
           {
             ...newConstraints,
             pattern: regex,
+            patternErrorMessage: options?.message,
           },
           createStringSchema,
         );
       },
 
-      email: (): StringSchema => {
+      email: (options?: ValidationOptions): StringSchema => {
         return createSchemaWithConstraints(
           {
             ...newConstraints,
             isEmail: true,
+            emailErrorMessage: options?.message,
           },
           createStringSchema,
         );
       },
 
-      url: (): StringSchema => {
+      url: (options?: ValidationOptions): StringSchema => {
         return createSchemaWithConstraints(
-          { ...newConstraints, isUrl: true },
+          {
+            ...newConstraints,
+            isUrl: true,
+            urlErrorMessage: options?.message,
+          },
           createStringSchema,
         );
       },

@@ -7,16 +7,23 @@ import { ArrayErrorCode, ArrayErrorMessages, formatMessage } from '../error.js';
 /**
  * Validate that a value is an array
  * @param value - The value to validate
+ * @param customErrorMessage - Optional custom error message
  * @returns The validation result with the original input value preserved in error cases.
  */
-export const validateType = (value: unknown): ArrayParseResult => {
+export const validateType = (
+  value: unknown,
+  customErrorMessage?: string,
+): ArrayParseResult => {
   if (!Array.isArray(value)) {
+    // In error case, preserve the original input value
+    // Type assertion is necessary here because ArrayParseResult expects unknown[]
+    // but we want to return the original non-array value for better error reporting
     return {
       success: false,
-      value: value as unknown[],
+      value: value as unknown[], // Preserve original value with type assertion
       error: {
         code: ArrayErrorCode.TYPE,
-        message: ArrayErrorMessages[ArrayErrorCode.TYPE],
+        message: customErrorMessage ?? ArrayErrorMessages[ArrayErrorCode.TYPE],
       },
     };
   }
@@ -27,11 +34,13 @@ export const validateType = (value: unknown): ArrayParseResult => {
  * Validate the minimum length of an array
  * @param value - The array to validate
  * @param minLength - The minimum length
+ * @param customErrorMessage - Optional custom error message
  * @returns The validation result
  */
 export const validateMinLength = (
   value: unknown[],
   minLength?: number,
+  customErrorMessage?: string,
 ): ArrayParseResult => {
   if (minLength !== undefined && value.length < minLength) {
     return {
@@ -39,10 +48,12 @@ export const validateMinLength = (
       value,
       error: {
         code: ArrayErrorCode.MIN_LENGTH,
-        message: formatMessage(
-          ArrayErrorMessages[ArrayErrorCode.MIN_LENGTH],
-          minLength,
-        ),
+        message:
+          customErrorMessage ??
+          formatMessage(
+            ArrayErrorMessages[ArrayErrorCode.MIN_LENGTH],
+            minLength,
+          ),
       },
     };
   }
@@ -53,11 +64,13 @@ export const validateMinLength = (
  * Validate the maximum length of an array
  * @param value - The array to validate
  * @param maxLength - The maximum length
+ * @param customErrorMessage - Optional custom error message
  * @returns The validation result
  */
 export const validateMaxLength = (
   value: unknown[],
   maxLength?: number,
+  customErrorMessage?: string,
 ): ArrayParseResult => {
   if (maxLength !== undefined && value.length > maxLength) {
     return {
@@ -65,10 +78,12 @@ export const validateMaxLength = (
       value,
       error: {
         code: ArrayErrorCode.MAX_LENGTH,
-        message: formatMessage(
-          ArrayErrorMessages[ArrayErrorCode.MAX_LENGTH],
-          maxLength,
-        ),
+        message:
+          customErrorMessage ??
+          formatMessage(
+            ArrayErrorMessages[ArrayErrorCode.MAX_LENGTH],
+            maxLength,
+          ),
       },
     };
   }

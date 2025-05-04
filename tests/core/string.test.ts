@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { StringErrorCode, StringErrorMessages } from '../src/core/error.js';
-import { q } from '../src/index.js';
-import { formatMessage } from './helper.js';
+import {
+  StringErrorCode,
+  StringErrorMessages,
+  formatMessage,
+} from '../../src/core/error.js';
+import { q } from '../../src/index.js';
 
 describe('string schema', () => {
   it('should validate strings', () => {

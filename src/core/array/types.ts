@@ -2,6 +2,17 @@
  * Type definitions for array schema
  */
 import type { ArrayParseResult } from '../common/index.js';
+
+/**
+ * Options for array schema creation
+ */
+export type ArraySchemaOptions = {
+  /**
+   * Custom error message to use when validation fails
+   */
+  message?: string;
+};
+
 /**
  * Interface for schemas with a parse method
  */
@@ -56,24 +67,33 @@ export type ArraySchema = {
   /**
    * Sets a minimum length for the array
    * @param length - The minimum length
+   * @param options - Optional validation options
    * @returns A new schema with the minimum length constraint
    */
-  min: (length: number) => ArraySchema;
+  min: (length: number, options?: ValidationOptions) => ArraySchema;
 
   /**
    * Sets a maximum length for the array
    * @param length - The maximum length
+   * @param options - Optional validation options
    * @returns A new schema with the maximum length constraint
    */
-  max: (length: number) => ArraySchema;
+  max: (length: number, options?: ValidationOptions) => ArraySchema;
 
   /**
    * Sets both minimum and maximum length for the array
    * @param min - The minimum length
-   * @param max - The maximum length
+   * @param maxOrOptions - Either the maximum length or validation options.
+   *                       If a number, it sets the maximum length.
+   *                       If an object, it provides validation options and min=max (exact length).
+   * @param optionsParam - Validation options when maxOrOptions is a number
    * @returns A new schema with the length constraints
    */
-  length: (min: number, max?: number) => ArraySchema;
+  length: (
+    min: number,
+    maxOrOptions?: number | ValidationOptions,
+    optionsParam?: ValidationOptions,
+  ) => ArraySchema;
 
   /**
    * Parse and validate a value as an array
@@ -87,9 +107,31 @@ export type ArraySchema = {
 };
 
 /**
+ * Options for validation methods
+ */
+export type ValidationOptions = {
+  /**
+   * Custom error message to use when validation fails
+   */
+  message?: string;
+};
+
+/**
  * Constraints for array schemas
  */
 export type ArrayConstraints = {
   minLength?: number;
   maxLength?: number;
+  /**
+   * Custom error message to use when type validation fails
+   */
+  customErrorMessage?: string;
+  /**
+   * Custom error message to use when min length validation fails
+   */
+  minLengthErrorMessage?: string;
+  /**
+   * Custom error message to use when max length validation fails
+   */
+  maxLengthErrorMessage?: string;
 };

@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { NumberErrorCode, NumberErrorMessages } from '../src/core/error.js';
-import { q } from '../src/index.js';
-import { formatMessage } from './helper.js';
+import {
+  NumberErrorCode,
+  NumberErrorMessages,
+  formatMessage,
+} from '../../src/core/error.js';
+import { q } from '../../src/index.js';
 
 describe('number schema', () => {
   it('should validate numbers', () => {

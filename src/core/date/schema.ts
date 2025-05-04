@@ -8,19 +8,27 @@ import {
   optional as makeOptional,
 } from '../common/schema.js';
 import { createSchemaWithConstraints } from '../utils/schema.js';
-import type { DateConstraints, DateSchema } from './types.js';
+import type {
+  DateConstraints,
+  DateSchema,
+  DateSchemaOptions,
+  ValidationOptions,
+} from './types.js';
 import * as validators from './validators.js';
 
 /**
  * Create a date schema
+ * @param options - Optional configuration options for the schema
  * @returns A new date schema
  * @remarks
  * IMPORTANT: When validating string inputs, only the 'YYYY-MM-DD' format (e.g., '2023-01-31') is supported.
  * Other date formats will result in validation errors.
  */
-const date = (): DateSchema => {
+const date = (options?: DateSchemaOptions): DateSchema => {
   // Store constraints
-  const constraints: DateConstraints = {};
+  const constraints: DateConstraints = {
+    customErrorMessage: options?.message,
+  };
 
   // Helper function to create a new schema with updated constraints
   const createDateSchema = (newConstraints: typeof constraints): DateSchema => {
@@ -40,7 +48,10 @@ const date = (): DateSchema => {
 
       parse: (value: unknown): DateParseResult => {
         // First, validate that the value is a date
-        const typeResult = validators.validateType(value);
+        const typeResult = validators.validateType(
+          value,
+          newConstraints.customErrorMessage,
+        );
         if (!typeResult.success) {
           return typeResult;
         }
@@ -50,12 +61,36 @@ const date = (): DateSchema => {
 
         // Validate each constraint with the new constraints
         const validations = [
-          validators.validateMin(dateValue, newConstraints.minDate),
-          validators.validateMax(dateValue, newConstraints.maxDate),
-          validators.validatePast(dateValue, newConstraints.isPast),
-          validators.validateFuture(dateValue, newConstraints.isFuture),
-          validators.validateBetween(dateValue, newConstraints.betweenDates),
-          validators.validateToday(dateValue, newConstraints.isToday),
+          validators.validateMin(
+            dateValue,
+            newConstraints.minDate,
+            newConstraints.minErrorMessage,
+          ),
+          validators.validateMax(
+            dateValue,
+            newConstraints.maxDate,
+            newConstraints.maxErrorMessage,
+          ),
+          validators.validatePast(
+            dateValue,
+            newConstraints.isPast,
+            newConstraints.pastErrorMessage,
+          ),
+          validators.validateFuture(
+            dateValue,
+            newConstraints.isFuture,
+            newConstraints.futureErrorMessage,
+          ),
+          validators.validateBetween(
+            dateValue,
+            newConstraints.betweenDates,
+            newConstraints.betweenErrorMessage,
+          ),
+          validators.validateToday(
+            dateValue,
+            newConstraints.isToday,
+            newConstraints.todayErrorMessage,
+          ),
         ];
 
         // Return the first validation failure, if any
@@ -72,61 +107,71 @@ const date = (): DateSchema => {
         };
       },
 
-      min: (date: Date): DateSchema => {
+      min: (date: Date, options?: ValidationOptions): DateSchema => {
         return createSchemaWithConstraints(
           {
             ...newConstraints,
             minDate: date,
+            minErrorMessage: options?.message,
           },
           createDateSchema,
         );
       },
 
-      max: (date: Date): DateSchema => {
+      max: (date: Date, options?: ValidationOptions): DateSchema => {
         return createSchemaWithConstraints(
           {
             ...newConstraints,
             maxDate: date,
+            maxErrorMessage: options?.message,
           },
           createDateSchema,
         );
       },
 
-      past: (): DateSchema => {
+      past: (options?: ValidationOptions): DateSchema => {
         return createSchemaWithConstraints(
           {
             ...newConstraints,
             isPast: true,
+            pastErrorMessage: options?.message,
           },
           createDateSchema,
         );
       },
 
-      future: (): DateSchema => {
+      future: (options?: ValidationOptions): DateSchema => {
         return createSchemaWithConstraints(
           {
             ...newConstraints,
             isFuture: true,
+            futureErrorMessage: options?.message,
           },
           createDateSchema,
         );
       },
 
-      between: (min: Date, max: Date): DateSchema => {
+      between: (
+        min: Date,
+        max: Date,
+        options?: ValidationOptions,
+      ): DateSchema => {
         return createSchemaWithConstraints(
           {
             ...newConstraints,
             betweenDates: [min, max] as [Date, Date],
+            betweenErrorMessage: options?.message,
           },
           createDateSchema,
         );
       },
 
-      today: (): DateSchema => {
+      today: (options?: ValidationOptions): DateSchema => {
         return createSchemaWithConstraints(
           {
             ...newConstraints,
             isToday: true,
+            todayErrorMessage: options?.message,
           },
           createDateSchema,
         );

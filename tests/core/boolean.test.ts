@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { BooleanErrorCode, BooleanErrorMessages } from '../src/core/error.js';
-import { q } from '../src/index.js';
+import {
+  BooleanErrorCode,
+  BooleanErrorMessages,
+} from '../../src/core/error.js';
+import { q } from '../../src/index.js';
 
 describe('boolean schema', () => {
   it('should validate booleans', () => {
