@@ -35,10 +35,10 @@ const object = (
     typeof shapeOrOptions === 'object' &&
     'message' in shapeOrOptions
   ) {
-    // First argument is options
+    // The First argument is options
     schemaOptions = shapeOrOptions as ObjectSchemaOptions;
   } else {
-    // First argument is shape
+    // The First argument is shape
     shape = shapeOrOptions;
     schemaOptions = options;
   }
@@ -66,6 +66,16 @@ const object = (
       return makeDefault(this, defaultValue);
     },
 
+    /**
+     * Specifies that the object should not contain any keys not defined in the shape
+     * @param options - Optional validation options
+     * @returns A new schema that rejects objects with unknown keys
+     * @remarks
+     * If a custom error message is provided in the options, it will be used
+     * specifically for unknown keys validation errors.
+     * This allows for targeted
+     * error messages when unknown properties are detected in strict mode.
+     */
     strict: function (options?: ValidationOptions) {
       const newSchema = {
         ...this,
@@ -76,6 +86,7 @@ const object = (
       newSchema._isStrict = true;
 
       // Update constraints with the new error message if provided
+      // This custom message will be used specifically for unknown keys validation errors
       if (options?.message) {
         constraints.unknownKeysErrorMessage = options.message;
       }
