@@ -101,7 +101,7 @@ const array = (itemSchemaOrOptions?: unknown): ArraySchema => {
        * @param min - The minimum length
        * @param maxOrOptions - Either the maximum length or validation options.
        *                       If a number, it sets the maximum length.
-       *                       If an object, it provides validation options and min=max.
+       *                       If an object, it provides validation options and min=max (exact length).
        * @param optionsParam - Validation options when maxOrOptions is a number
        * @returns A new schema with the length constraints
        * @example
@@ -119,33 +119,29 @@ const array = (itemSchemaOrOptions?: unknown): ArraySchema => {
         maxOrOptions?: number | ValidationOptions,
         optionsParam?: ValidationOptions,
       ): ArraySchema => {
-        // Handle the case where the second argument is options
+        // There are two ways to call this method:
+        // 1. length(exactLength, options?) - Sets min and max to the same value
+        // 2. length(min, max, options?) - Sets different min and max values
+
+        // Determine if the second argument is a validation options object
         const isMaxOptions = typeof maxOrOptions === 'object';
-        const localOptions = isMaxOptions ? maxOrOptions : optionsParam;
+
+        // Get the validation options from either the second or third argument
+        const validationOptions = isMaxOptions ? maxOrOptions : optionsParam;
+
+        // Determine the max value:
+        // - If maxOrOptions is a number, use it as max
+        // - Otherwise, use min as both min and max (exact length)
         const max = typeof maxOrOptions === 'number' ? maxOrOptions : min;
 
-        if (maxOrOptions === undefined || isMaxOptions) {
-          // If max is not provided or is options,
-          // set both min and max to the same value
-          return createSchemaWithConstraints(
-            {
-              ...newConstraints,
-              minLength: min,
-              maxLength: min,
-              minLengthErrorMessage: localOptions?.message,
-              maxLengthErrorMessage: localOptions?.message,
-            },
-            createArraySchema,
-          );
-        }
-
+        // Create a new schema with the constraints
         return createSchemaWithConstraints(
           {
             ...newConstraints,
             minLength: min,
             maxLength: max,
-            minLengthErrorMessage: localOptions?.message,
-            maxLengthErrorMessage: localOptions?.message,
+            minLengthErrorMessage: validationOptions?.message,
+            maxLengthErrorMessage: validationOptions?.message,
           },
           createArraySchema,
         );

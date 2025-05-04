@@ -83,14 +83,16 @@ export type ArraySchema = {
   /**
    * Sets both minimum and maximum length for the array
    * @param min - The minimum length
-   * @param max - The maximum length or validation options
-   * @param options - Optional validation options
+   * @param maxOrOptions - Either the maximum length or validation options.
+   *                       If a number, it sets the maximum length.
+   *                       If an object, it provides validation options and min=max (exact length).
+   * @param optionsParam - Validation options when maxOrOptions is a number
    * @returns A new schema with the length constraints
    */
   length: (
     min: number,
-    max?: number | ValidationOptions,
-    options?: ValidationOptions,
+    maxOrOptions?: number | ValidationOptions,
+    optionsParam?: ValidationOptions,
   ) => ArraySchema;
 
   /**
