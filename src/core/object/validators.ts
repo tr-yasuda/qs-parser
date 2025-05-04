@@ -19,16 +19,22 @@ const getValueType = (value: unknown): string => {
 /**
  * Validate that a value is an object
  * @param value - The value to validate
+ * @param customErrorMessage - Optional custom error message
  * @returns The validation result with the original input value preserved in error cases.
  */
-export const validateType = (value: unknown): ObjectParseResult => {
+export const validateType = (
+  value: unknown,
+  customErrorMessage?: string,
+): ObjectParseResult => {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
     return {
       success: false,
       value: value as Record<string, unknown>,
       error: {
         code: ObjectErrorCode.TYPE,
-        message: `${ObjectErrorMessages[ObjectErrorCode.TYPE]}, got ${getValueType(value)}`,
+        message:
+          customErrorMessage ??
+          `${ObjectErrorMessages[ObjectErrorCode.TYPE]}, got ${getValueType(value)}`,
       },
     };
   }
@@ -40,12 +46,16 @@ export const validateType = (value: unknown): ObjectParseResult => {
  * @param value - The object to validate
  * @param shape - The shape definition to validate against
  * @param strict - Whether to reject unknown keys
+ * @param requiredErrorMessage - Optional custom error message for required keys
+ * @param unknownKeysErrorMessage - Optional custom error message for unknown keys
  * @returns The validation result
  */
 export const validateShape = (
   value: Record<string, unknown>,
   shape: ShapeDefinition,
   strict = false,
+  requiredErrorMessage?: string,
+  unknownKeysErrorMessage?: string,
 ): ObjectParseResult => {
   // Check for required keys
   for (const key of Object.keys(shape)) {
@@ -55,10 +65,9 @@ export const validateShape = (
         value,
         error: {
           code: ObjectErrorCode.REQUIRED,
-          message: ObjectErrorMessages[ObjectErrorCode.REQUIRED].replace(
-            '{0}',
-            key,
-          ),
+          message:
+            requiredErrorMessage ??
+            ObjectErrorMessages[ObjectErrorCode.REQUIRED].replace('{0}', key),
         },
       };
     }
@@ -73,10 +82,12 @@ export const validateShape = (
         value,
         error: {
           code: ObjectErrorCode.UNKNOWN_KEYS,
-          message: ObjectErrorMessages[ObjectErrorCode.UNKNOWN_KEYS].replace(
-            '{0}',
-            unknownKeys.join(', '),
-          ),
+          message:
+            unknownKeysErrorMessage ??
+            ObjectErrorMessages[ObjectErrorCode.UNKNOWN_KEYS].replace(
+              '{0}',
+              unknownKeys.join(', '),
+            ),
         },
       };
     }

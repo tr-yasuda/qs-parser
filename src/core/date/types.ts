@@ -4,6 +4,26 @@
 import type { DateParseResult } from '../common/index.js';
 
 /**
+ * Options for date schema creation
+ */
+export type DateSchemaOptions = {
+  /**
+   * Custom error message to use when validation fails
+   */
+  message?: string;
+};
+
+/**
+ * Options for validation methods
+ */
+export type ValidationOptions = {
+  /**
+   * Custom error message to use when validation fails
+   */
+  message?: string;
+};
+
+/**
  * Constraints for date validation
  */
 export type DateConstraints = {
@@ -13,6 +33,34 @@ export type DateConstraints = {
   isFuture?: boolean;
   betweenDates?: [Date, Date];
   isToday?: boolean;
+  /**
+   * Custom error message to use when type validation fails
+   */
+  customErrorMessage?: string;
+  /**
+   * Custom error message to use when min validation fails
+   */
+  minErrorMessage?: string;
+  /**
+   * Custom error message to use when max validation fails
+   */
+  maxErrorMessage?: string;
+  /**
+   * Custom error message to use when past validation fails
+   */
+  pastErrorMessage?: string;
+  /**
+   * Custom error message to use when future validation fails
+   */
+  futureErrorMessage?: string;
+  /**
+   * Custom error message to use when between validation fails
+   */
+  betweenErrorMessage?: string;
+  /**
+   * Custom error message to use when today validation fails
+   */
+  todayErrorMessage?: string;
 };
 
 /**
@@ -61,40 +109,46 @@ export type DateSchema = {
   /**
    * Set a minimum date constraint (inclusive, >=)
    * @param date - The minimum allowed date
+   * @param options - Optional validation options
    * @returns A new date schema with the constraint
    */
-  min: (date: Date) => DateSchema;
+  min: (date: Date, options?: ValidationOptions) => DateSchema;
 
   /**
    * Set a maximum date constraint (inclusive, <=)
    * @param date - The maximum allowed date
+   * @param options - Optional validation options
    * @returns A new date schema with the constraint
    */
-  max: (date: Date) => DateSchema;
+  max: (date: Date, options?: ValidationOptions) => DateSchema;
 
   /**
    * Set a past date constraint (< now)
+   * @param options - Optional validation options
    * @returns A new date schema with the constraint
    */
-  past: () => DateSchema;
+  past: (options?: ValidationOptions) => DateSchema;
 
   /**
    * Set a future date constraint (> now)
+   * @param options - Optional validation options
    * @returns A new date schema with the constraint
    */
-  future: () => DateSchema;
+  future: (options?: ValidationOptions) => DateSchema;
 
   /**
    * Set a between dates constraint (inclusive)
    * @param min - The minimum allowed date
    * @param max - The maximum allowed date
+   * @param options - Optional validation options
    * @returns A new date schema with the constraint
    */
-  between: (min: Date, max: Date) => DateSchema;
+  between: (min: Date, max: Date, options?: ValidationOptions) => DateSchema;
 
   /**
    * Set a today constraint (same day as now)
+   * @param options - Optional validation options
    * @returns A new date schema with the constraint
    */
-  today: () => DateSchema;
+  today: (options?: ValidationOptions) => DateSchema;
 };

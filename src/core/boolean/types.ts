@@ -4,6 +4,26 @@
 import type { BooleanParseResult } from '../common/index.js';
 
 /**
+ * Options for boolean schema creation
+ */
+export type BooleanSchemaOptions = {
+  /**
+   * Custom error message to use when validation fails
+   */
+  message?: string;
+};
+
+/**
+ * Constraints for boolean validation
+ */
+export type BooleanConstraints = {
+  /**
+   * Custom error message to use when type validation fails
+   */
+  customErrorMessage?: string;
+};
+
+/**
  * Boolean schema type
  * Defines the interface for boolean validation schemas
  */

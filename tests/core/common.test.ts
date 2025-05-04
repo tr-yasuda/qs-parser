@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { q } from '../src/index.js';
+import { q } from '../../src/index.js';
 
 describe('Common schema utilities', () => {
   describe('optional', () => {

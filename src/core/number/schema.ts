@@ -8,16 +8,24 @@ import {
   optional as makeOptional,
 } from '../common/schema.js';
 import { createSchemaWithConstraints } from '../utils/schema.js';
-import type { NumberConstraints, NumberSchema } from './types.js';
+import type {
+  NumberConstraints,
+  NumberSchema,
+  NumberSchemaOptions,
+  ValidationOptions,
+} from './types.js';
 import * as validators from './validators.js';
 
 /**
  * Create a number schema
+ * @param options - Optional configuration options for the schema
  * @returns A new number schema
  */
-const number = (): NumberSchema => {
+const number = (options?: NumberSchemaOptions): NumberSchema => {
   // Store constraints
-  const constraints: NumberConstraints = {};
+  const constraints: NumberConstraints = {
+    customErrorMessage: options?.message,
+  };
 
   // Helper function to create a new schema with updated constraints
   const createNumberSchema = (
@@ -39,7 +47,10 @@ const number = (): NumberSchema => {
 
       parse: (value: unknown): NumberParseResult => {
         // First, validate that the value is a number
-        const typeResult = validators.validateType(value);
+        const typeResult = validators.validateType(
+          value,
+          newConstraints.customErrorMessage,
+        );
         if (!typeResult.success) {
           return typeResult;
         }
@@ -49,24 +60,66 @@ const number = (): NumberSchema => {
 
         // Validate each constraint with the new constraints
         const validations = [
-          validators.validateMin(numberValue, newConstraints.min),
-          validators.validateGt(numberValue, newConstraints.gt),
-          validators.validateMax(numberValue, newConstraints.max),
-          validators.validateLt(numberValue, newConstraints.lt),
-          validators.validateInt(numberValue, newConstraints.isInt),
-          validators.validatePositive(numberValue, newConstraints.isPositive),
+          validators.validateMin(
+            numberValue,
+            newConstraints.min,
+            newConstraints.minErrorMessage,
+          ),
+          validators.validateGt(
+            numberValue,
+            newConstraints.gt,
+            newConstraints.gtErrorMessage,
+          ),
+          validators.validateMax(
+            numberValue,
+            newConstraints.max,
+            newConstraints.maxErrorMessage,
+          ),
+          validators.validateLt(
+            numberValue,
+            newConstraints.lt,
+            newConstraints.ltErrorMessage,
+          ),
+          validators.validateInt(
+            numberValue,
+            newConstraints.isInt,
+            newConstraints.intErrorMessage,
+          ),
+          validators.validatePositive(
+            numberValue,
+            newConstraints.isPositive,
+            newConstraints.positiveErrorMessage,
+          ),
           validators.validateNonNegative(
             numberValue,
             newConstraints.isNonNegative,
+            newConstraints.nonNegativeErrorMessage,
           ),
-          validators.validateNegative(numberValue, newConstraints.isNegative),
+          validators.validateNegative(
+            numberValue,
+            newConstraints.isNegative,
+            newConstraints.negativeErrorMessage,
+          ),
           validators.validateNonPositive(
             numberValue,
             newConstraints.isNonPositive,
+            newConstraints.nonPositiveErrorMessage,
           ),
-          validators.validateMultipleOf(numberValue, newConstraints.multipleOf),
-          validators.validateFinite(numberValue, newConstraints.isFinite),
-          validators.validateSafe(numberValue, newConstraints.isSafe),
+          validators.validateMultipleOf(
+            numberValue,
+            newConstraints.multipleOf,
+            newConstraints.multipleOfErrorMessage,
+          ),
+          validators.validateFinite(
+            numberValue,
+            newConstraints.isFinite,
+            newConstraints.finiteErrorMessage,
+          ),
+          validators.validateSafe(
+            numberValue,
+            newConstraints.isSafe,
+            newConstraints.safeErrorMessage,
+          ),
         ];
 
         // Return the first validation failure, if any
@@ -83,128 +136,161 @@ const number = (): NumberSchema => {
         };
       },
 
-      min: (value: number): NumberSchema => {
+      min: (value: number, options?: ValidationOptions): NumberSchema => {
         return createSchemaWithConstraints(
-          { ...newConstraints, min: value },
+          {
+            ...newConstraints,
+            min: value,
+            minErrorMessage: options?.message,
+          },
           createNumberSchema,
         );
       },
 
-      gte: (value: number): NumberSchema => {
+      gte: (value: number, options?: ValidationOptions): NumberSchema => {
         // Alias for min
         return createSchemaWithConstraints(
           newConstraints,
           createNumberSchema,
-        ).min(value);
+        ).min(value, options);
       },
 
-      gt: (value: number): NumberSchema => {
+      gt: (value: number, options?: ValidationOptions): NumberSchema => {
         return createSchemaWithConstraints(
-          { ...newConstraints, gt: value },
+          {
+            ...newConstraints,
+            gt: value,
+            gtErrorMessage: options?.message,
+          },
           createNumberSchema,
         );
       },
 
-      max: (value: number): NumberSchema => {
+      max: (value: number, options?: ValidationOptions): NumberSchema => {
         return createSchemaWithConstraints(
-          { ...newConstraints, max: value },
+          {
+            ...newConstraints,
+            max: value,
+            maxErrorMessage: options?.message,
+          },
           createNumberSchema,
         );
       },
 
-      lte: (value: number): NumberSchema => {
+      lte: (value: number, options?: ValidationOptions): NumberSchema => {
         // Alias for max
         return createSchemaWithConstraints(
           newConstraints,
           createNumberSchema,
-        ).max(value);
+        ).max(value, options);
       },
 
-      lt: (value: number): NumberSchema => {
+      lt: (value: number, options?: ValidationOptions): NumberSchema => {
         return createSchemaWithConstraints(
-          { ...newConstraints, lt: value },
+          {
+            ...newConstraints,
+            lt: value,
+            ltErrorMessage: options?.message,
+          },
           createNumberSchema,
         );
       },
 
-      int: (): NumberSchema => {
+      int: (options?: ValidationOptions): NumberSchema => {
         return createSchemaWithConstraints(
-          { ...newConstraints, isInt: true },
+          {
+            ...newConstraints,
+            isInt: true,
+            intErrorMessage: options?.message,
+          },
           createNumberSchema,
         );
       },
 
-      positive: (): NumberSchema => {
+      positive: (options?: ValidationOptions): NumberSchema => {
         return createSchemaWithConstraints(
           {
             ...newConstraints,
             isPositive: true,
+            positiveErrorMessage: options?.message,
           },
           createNumberSchema,
         );
       },
 
-      nonNegative: (): NumberSchema => {
+      nonNegative: (options?: ValidationOptions): NumberSchema => {
         return createSchemaWithConstraints(
           {
             ...newConstraints,
             isNonNegative: true,
+            nonNegativeErrorMessage: options?.message,
           },
           createNumberSchema,
         );
       },
 
-      negative: (): NumberSchema => {
+      negative: (options?: ValidationOptions): NumberSchema => {
         return createSchemaWithConstraints(
           {
             ...newConstraints,
             isNegative: true,
+            negativeErrorMessage: options?.message,
           },
           createNumberSchema,
         );
       },
 
-      nonPositive: (): NumberSchema => {
+      nonPositive: (options?: ValidationOptions): NumberSchema => {
         return createSchemaWithConstraints(
           {
             ...newConstraints,
             isNonPositive: true,
+            nonPositiveErrorMessage: options?.message,
           },
           createNumberSchema,
         );
       },
 
-      multipleOf: (value: number): NumberSchema => {
+      multipleOf: (
+        value: number,
+        options?: ValidationOptions,
+      ): NumberSchema => {
         return createSchemaWithConstraints(
           {
             ...newConstraints,
             multipleOf: value,
+            multipleOfErrorMessage: options?.message,
           },
           createNumberSchema,
         );
       },
 
-      step: (value: number): NumberSchema => {
+      step: (value: number, options?: ValidationOptions): NumberSchema => {
         // Alias for multipleOf
         return createSchemaWithConstraints(
           newConstraints,
           createNumberSchema,
-        ).multipleOf(value);
+        ).multipleOf(value, options);
       },
 
-      finite: (): NumberSchema => {
+      finite: (options?: ValidationOptions): NumberSchema => {
         return createSchemaWithConstraints(
           {
             ...newConstraints,
             isFinite: true,
+            finiteErrorMessage: options?.message,
           },
           createNumberSchema,
         );
       },
 
-      safe: (): NumberSchema => {
+      safe: (options?: ValidationOptions): NumberSchema => {
         return createSchemaWithConstraints(
-          { ...newConstraints, isSafe: true },
+          {
+            ...newConstraints,
+            isSafe: true,
+            safeErrorMessage: options?.message,
+          },
           createNumberSchema,
         );
       },

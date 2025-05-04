@@ -11,7 +11,9 @@ import { createSchemaWithConstraints } from '../utils/schema.js';
 import type {
   ArrayConstraints,
   ArraySchema,
+  ArraySchemaOptions,
   ParseableSchema,
+  ValidationOptions,
 } from './types.js';
 import * as validators from './validators.js';
 
@@ -27,12 +29,30 @@ const isParseable = (value: unknown): value is ParseableSchema => {
 
 /**
  * Create an array schema
- * @param itemSchema - Optional schema for array items
+ * @param itemSchemaOrOptions - Optional schema for array items or options
  * @returns A new array schema
  */
-const array = (itemSchema?: unknown): ArraySchema => {
+const array = (itemSchemaOrOptions?: unknown): ArraySchema => {
+  // Determine if the first argument is options or an item schema
+  let itemSchema: unknown = undefined;
+  let options: ArraySchemaOptions | undefined = undefined;
+
+  if (
+    itemSchemaOrOptions !== undefined &&
+    typeof itemSchemaOrOptions === 'object' &&
+    itemSchemaOrOptions !== null &&
+    !Array.isArray(itemSchemaOrOptions) &&
+    'message' in itemSchemaOrOptions
+  ) {
+    options = itemSchemaOrOptions as ArraySchemaOptions;
+  } else {
+    itemSchema = itemSchemaOrOptions;
+  }
+
   // Store constraints
-  const constraints: ArrayConstraints = {};
+  const constraints: ArrayConstraints = {
+    customErrorMessage: options?.message,
+  };
 
   // Helper function to create a new schema with updated constraints
   const createArraySchema = (
@@ -56,35 +76,69 @@ const array = (itemSchema?: unknown): ArraySchema => {
         return makeDefault(this, defaultValue);
       },
 
-      min: (length: number): ArraySchema =>
+      min: (length: number, options?: ValidationOptions): ArraySchema =>
         createSchemaWithConstraints(
-          { ...newConstraints, minLength: length },
+          {
+            ...newConstraints,
+            minLength: length,
+            minLengthErrorMessage: options?.message,
+          },
           createArraySchema,
         ),
 
-      max: (length: number): ArraySchema =>
+      max: (length: number, options?: ValidationOptions): ArraySchema =>
         createSchemaWithConstraints(
-          { ...newConstraints, maxLength: length },
+          {
+            ...newConstraints,
+            maxLength: length,
+            maxLengthErrorMessage: options?.message,
+          },
           createArraySchema,
         ),
 
-      length: (min: number, max?: number): ArraySchema => {
-        if (max === undefined) {
-          // If max is not provided, set both min and max to the same value
+      length: (
+        min: number,
+        maxOrOptions?: number | ValidationOptions,
+        optionsParam?: ValidationOptions,
+      ): ArraySchema => {
+        // Handle the case where the second argument is options
+        const isMaxOptions = typeof maxOrOptions === 'object';
+        const localOptions = isMaxOptions ? maxOrOptions : optionsParam;
+        const max = typeof maxOrOptions === 'number' ? maxOrOptions : min;
+
+        if (maxOrOptions === undefined || isMaxOptions) {
+          // If max is not provided or is options,
+          // set both min and max to the same value
           return createSchemaWithConstraints(
-            { ...newConstraints, minLength: min, maxLength: min },
+            {
+              ...newConstraints,
+              minLength: min,
+              maxLength: min,
+              minLengthErrorMessage: localOptions?.message,
+              maxLengthErrorMessage: localOptions?.message,
+            },
             createArraySchema,
           );
         }
+
         return createSchemaWithConstraints(
-          { ...newConstraints, minLength: min, maxLength: max },
+          {
+            ...newConstraints,
+            minLength: min,
+            maxLength: max,
+            minLengthErrorMessage: localOptions?.message,
+            maxLengthErrorMessage: localOptions?.message,
+          },
           createArraySchema,
         );
       },
 
       parse: function (value: unknown): ArrayParseResult {
         // Validate that the value is an array
-        const typeResult = validators.validateType(value);
+        const typeResult = validators.validateType(
+          value,
+          this._constraints.customErrorMessage,
+        );
         if (!typeResult.success) {
           return typeResult;
         }
@@ -96,6 +150,7 @@ const array = (itemSchema?: unknown): ArraySchema => {
         const minLengthResult = validators.validateMinLength(
           arrayValue,
           this._constraints.minLength,
+          this._constraints.minLengthErrorMessage,
         );
         if (!minLengthResult.success) {
           return minLengthResult;
@@ -104,6 +159,7 @@ const array = (itemSchema?: unknown): ArraySchema => {
         const maxLengthResult = validators.validateMaxLength(
           arrayValue,
           this._constraints.maxLength,
+          this._constraints.maxLengthErrorMessage,
         );
         if (!maxLengthResult.success) {
           return maxLengthResult;

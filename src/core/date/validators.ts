@@ -7,6 +7,7 @@ import { DateErrorCode, DateErrorMessages, formatMessage } from '../error.js';
 /**
  * Validate that a value is a date
  * @param value - The value to validate
+ * @param customErrorMessage - Optional custom error message
  * @returns The validation result with the original input value preserved in error cases.
  *          If the value is a string in YYYY-MM-DD format, it will be parsed into a Date.
  *          Note: The type assertion (value as unknown as Date) does not perform any transformation
@@ -16,7 +17,10 @@ import { DateErrorCode, DateErrorMessages, formatMessage } from '../error.js';
  * Other date formats like 'MM/DD/YYYY', 'DD-MM-YYYY', or ISO date strings with time components
  * are not supported and will result in validation errors.
  */
-export const validateType = (value: unknown): DateParseResult => {
+export const validateType = (
+  value: unknown,
+  customErrorMessage?: string,
+): DateParseResult => {
   // If the value is a string, try to parse it as a Date
   if (typeof value === 'string') {
     // Check if the string is in YYYY-MM-DD format
@@ -44,25 +48,27 @@ export const validateType = (value: unknown): DateParseResult => {
     }
 
     // If it's not a valid date string, return an error
+    const defaultMessage = `${DateErrorMessages[DateErrorCode.TYPE]}, got ${typeof value}. Expected a Date object or a string in 'YYYY-MM-DD' format`;
     return {
       success: false,
       // Original value preserved without coercion
       value: value as unknown as Date,
       error: {
         code: DateErrorCode.TYPE,
-        message: `${DateErrorMessages[DateErrorCode.TYPE]}, got ${typeof value}. Expected a Date object or a string in 'YYYY-MM-DD' format`,
+        message: customErrorMessage ?? defaultMessage,
       },
     };
   }
 
   // Check if the value is a Date object
   if (!(value instanceof Date) || Number.isNaN(value.getTime())) {
+    const defaultMessage = `${DateErrorMessages[DateErrorCode.TYPE]}, got ${typeof value}. Expected a Date object or a string in 'YYYY-MM-DD' format`;
     return {
       success: false,
-      value: value as Date, // Original value preserved without coercion
+      value: value as Date, // Preserve original value with type assertion
       error: {
         code: DateErrorCode.TYPE,
-        message: `${DateErrorMessages[DateErrorCode.TYPE]}, got ${typeof value}. Expected a Date object or a string in 'YYYY-MM-DD' format`,
+        message: customErrorMessage ?? defaultMessage,
       },
     };
   }
@@ -73,19 +79,26 @@ export const validateType = (value: unknown): DateParseResult => {
  * Validate minimum date constraint (inclusive, >=)
  * @param value - The date to validate
  * @param minDate - The minimum allowed date
+ * @param customErrorMessage - Optional custom error message
  * @returns The validation result
  */
-export const validateMin = (value: Date, minDate?: Date): DateParseResult => {
+export const validateMin = (
+  value: Date,
+  minDate?: Date,
+  customErrorMessage?: string,
+): DateParseResult => {
   if (minDate !== undefined && value < minDate) {
     return {
       success: false,
       value,
       error: {
         code: DateErrorCode.MIN,
-        message: formatMessage(
-          DateErrorMessages[DateErrorCode.MIN],
-          minDate.toISOString(),
-        ),
+        message:
+          customErrorMessage ??
+          formatMessage(
+            DateErrorMessages[DateErrorCode.MIN],
+            minDate.toISOString(),
+          ),
       },
     };
   }
@@ -96,19 +109,26 @@ export const validateMin = (value: Date, minDate?: Date): DateParseResult => {
  * Validate maximum date constraint (inclusive, <=)
  * @param value - The date to validate
  * @param maxDate - The maximum allowed date
+ * @param customErrorMessage - Optional custom error message
  * @returns The validation result
  */
-export const validateMax = (value: Date, maxDate?: Date): DateParseResult => {
+export const validateMax = (
+  value: Date,
+  maxDate?: Date,
+  customErrorMessage?: string,
+): DateParseResult => {
   if (maxDate !== undefined && value > maxDate) {
     return {
       success: false,
       value,
       error: {
         code: DateErrorCode.MAX,
-        message: formatMessage(
-          DateErrorMessages[DateErrorCode.MAX],
-          maxDate.toISOString(),
-        ),
+        message:
+          customErrorMessage ??
+          formatMessage(
+            DateErrorMessages[DateErrorCode.MAX],
+            maxDate.toISOString(),
+          ),
       },
     };
   }
@@ -119,11 +139,13 @@ export const validateMax = (value: Date, maxDate?: Date): DateParseResult => {
  * Validate past date constraint (< now)
  * @param value - The date to validate
  * @param isPast - Whether to validate as past date
+ * @param customErrorMessage - Optional custom error message
  * @returns The validations result
  */
 export const validatePast = (
   value: Date,
   isPast?: boolean,
+  customErrorMessage?: string,
 ): DateParseResult => {
   if (isPast) {
     const now = new Date();
@@ -133,7 +155,7 @@ export const validatePast = (
         value,
         error: {
           code: DateErrorCode.PAST,
-          message: DateErrorMessages[DateErrorCode.PAST],
+          message: customErrorMessage ?? DateErrorMessages[DateErrorCode.PAST],
         },
       };
     }
@@ -145,11 +167,13 @@ export const validatePast = (
  * Validate future date constraint (> now)
  * @param value - The date to validate
  * @param isFuture - Whether to validate as future date
+ * @param customErrorMessage - Optional custom error message
  * @returns The validations result
  */
 export const validateFuture = (
   value: Date,
   isFuture?: boolean,
+  customErrorMessage?: string,
 ): DateParseResult => {
   if (isFuture) {
     const now = new Date();
@@ -159,7 +183,8 @@ export const validateFuture = (
         value,
         error: {
           code: DateErrorCode.FUTURE,
-          message: DateErrorMessages[DateErrorCode.FUTURE],
+          message:
+            customErrorMessage ?? DateErrorMessages[DateErrorCode.FUTURE],
         },
       };
     }
@@ -171,11 +196,13 @@ export const validateFuture = (
  * Validate between dates constraint (inclusive)
  * @param value - The date to validate
  * @param betweenDates - The minimum and maximum allowed dates
+ * @param customErrorMessage - Optional custom error message
  * @returns The validation result
  */
 export const validateBetween = (
   value: Date,
   betweenDates?: [Date, Date],
+  customErrorMessage?: string,
 ): DateParseResult => {
   if (betweenDates !== undefined) {
     const [min, max] = betweenDates;
@@ -188,11 +215,13 @@ export const validateBetween = (
         value,
         error: {
           code: DateErrorCode.BETWEEN,
-          message: formatMessage(
-            DateErrorMessages[DateErrorCode.BETWEEN],
-            min.toISOString(),
-            max.toISOString(),
-          ),
+          message:
+            customErrorMessage ??
+            formatMessage(
+              DateErrorMessages[DateErrorCode.BETWEEN],
+              min.toISOString(),
+              max.toISOString(),
+            ),
         },
       };
     }
@@ -205,11 +234,13 @@ export const validateBetween = (
         value,
         error: {
           code: DateErrorCode.BETWEEN,
-          message: formatMessage(
-            DateErrorMessages[DateErrorCode.BETWEEN],
-            min.toISOString(),
-            max.toISOString(),
-          ),
+          message:
+            customErrorMessage ??
+            formatMessage(
+              DateErrorMessages[DateErrorCode.BETWEEN],
+              min.toISOString(),
+              max.toISOString(),
+            ),
         },
       };
     }
@@ -242,11 +273,13 @@ const isSameDay = (date1: Date, date2: Date): boolean => {
  * Validate today constraint (same day as now)
  * @param value - The date to validate
  * @param isToday - Whether to validate as today
+ * @param customErrorMessage - Optional custom error message
  * @returns The validation result
  */
 export const validateToday = (
   value: Date,
   isToday?: boolean,
+  customErrorMessage?: string,
 ): DateParseResult => {
   if (isToday) {
     const now = new Date();
@@ -256,7 +289,7 @@ export const validateToday = (
         value,
         error: {
           code: DateErrorCode.TODAY,
-          message: DateErrorMessages[DateErrorCode.TODAY],
+          message: customErrorMessage ?? DateErrorMessages[DateErrorCode.TODAY],
         },
       };
     }

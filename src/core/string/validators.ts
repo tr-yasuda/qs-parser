@@ -12,18 +12,24 @@ import {
 /**
  * Validate that a value is a string
  * @param value - The value to validate
+ * @param customErrorMessage - Optional custom error message
  * @returns The validation result with the original input value preserved in error cases.
  *          Note: The type assertion (value as string) does not perform any transformation
  *          at runtime; it only informs TypeScript about the expected type.
  */
-export const validateType = (value: unknown): StringParseResult => {
+export const validateType = (
+  value: unknown,
+  customErrorMessage?: string,
+): StringParseResult => {
   if (typeof value !== 'string') {
     return {
       success: false,
-      value: value as string, // Original value preserved without coercion
+      value: value as string, // Preserve original value with type assertion
       error: {
         code: StringErrorCode.TYPE,
-        message: `${StringErrorMessages[StringErrorCode.TYPE]}, got ${typeof value}`,
+        message:
+          customErrorMessage ??
+          `${StringErrorMessages[StringErrorCode.TYPE]}, got ${typeof value}`,
       },
     };
   }
@@ -34,11 +40,13 @@ export const validateType = (value: unknown): StringParseResult => {
  * Validate maximum length constraint
  * @param value - The string to validate
  * @param maxLength - The maximum allowed length
+ * @param customErrorMessage - Optional custom error message
  * @returns The validation result
  */
 export const validateMaxLength = (
   value: string,
   maxLength?: number,
+  customErrorMessage?: string,
 ): StringParseResult => {
   if (maxLength !== undefined && value.length > maxLength) {
     return {
@@ -46,10 +54,12 @@ export const validateMaxLength = (
       value,
       error: {
         code: StringErrorCode.MAX_LENGTH,
-        message: formatMessage(
-          StringErrorMessages[StringErrorCode.MAX_LENGTH],
-          maxLength,
-        ),
+        message:
+          customErrorMessage ??
+          formatMessage(
+            StringErrorMessages[StringErrorCode.MAX_LENGTH],
+            maxLength,
+          ),
       },
     };
   }
@@ -60,11 +70,13 @@ export const validateMaxLength = (
  * Validate minimum length constraint
  * @param value - The string to validate
  * @param minLength - The minimum allowed length
+ * @param customErrorMessage - Optional custom error message
  * @returns The validation result
  */
 export const validateMinLength = (
   value: string,
   minLength?: number,
+  customErrorMessage?: string,
 ): StringParseResult => {
   if (minLength !== undefined && value.length < minLength) {
     return {
@@ -72,10 +84,12 @@ export const validateMinLength = (
       value,
       error: {
         code: StringErrorCode.MIN_LENGTH,
-        message: formatMessage(
-          StringErrorMessages[StringErrorCode.MIN_LENGTH],
-          minLength,
-        ),
+        message:
+          customErrorMessage ??
+          formatMessage(
+            StringErrorMessages[StringErrorCode.MIN_LENGTH],
+            minLength,
+          ),
       },
     };
   }
@@ -87,11 +101,13 @@ export const validateMinLength = (
  * Validate pattern constraint
  * @param value - The string to validate
  * @param pattern - The pattern to match
+ * @param customErrorMessage - Optional custom error message
  * @returns The validation result
  */
 export const validatePattern = (
   value: string,
   pattern?: RegExp,
+  customErrorMessage?: string,
 ): StringParseResult => {
   if (pattern !== undefined && !pattern.test(value)) {
     return {
@@ -99,10 +115,9 @@ export const validatePattern = (
       value,
       error: {
         code: StringErrorCode.PATTERN,
-        message: formatMessage(
-          StringErrorMessages[StringErrorCode.PATTERN],
-          pattern,
-        ),
+        message:
+          customErrorMessage ??
+          formatMessage(StringErrorMessages[StringErrorCode.PATTERN], pattern),
       },
     };
   }
@@ -113,11 +128,13 @@ export const validatePattern = (
  * Validate email constraint
  * @param value - The string to validate
  * @param isEmail - Whether to validate as email
+ * @param customErrorMessage - Optional custom error message
  * @returns The validation result
  */
 export const validateEmail = (
   value: string,
   isEmail?: boolean,
+  customErrorMessage?: string,
 ): StringParseResult => {
   if (isEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
     return {
@@ -125,7 +142,8 @@ export const validateEmail = (
       value,
       error: {
         code: StringErrorCode.EMAIL,
-        message: StringErrorMessages[StringErrorCode.EMAIL],
+        message:
+          customErrorMessage ?? StringErrorMessages[StringErrorCode.EMAIL],
       },
     };
   }
@@ -136,11 +154,13 @@ export const validateEmail = (
  * Validate URL constraint
  * @param value - The string to validate
  * @param isUrl - Whether to validate as URL
- * @returns The validation result
+ * @param customErrorMessage - Optional custom error message
+ * @returns The validations result
  */
 export const validateUrl = (
   value: string,
   isUrl?: boolean,
+  customErrorMessage?: string,
 ): StringParseResult => {
   if (isUrl) {
     try {
@@ -151,7 +171,8 @@ export const validateUrl = (
         value,
         error: {
           code: StringErrorCode.URL,
-          message: StringErrorMessages[StringErrorCode.URL],
+          message:
+            customErrorMessage ?? StringErrorMessages[StringErrorCode.URL],
         },
       };
     }
