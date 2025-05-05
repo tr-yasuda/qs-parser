@@ -63,8 +63,8 @@ function setNestedValue(
       } else if (typeof current === 'object') {
         // This is an edge case where we have both a value and a nested object
         // with the same key prefix, e.g., "user=john" and "user.name=john"
-        // In this case, we'll keep the object and add a special "__value" property
-        current.__value = value;
+        // In this case, we'll keep the object and add a special "_value" property
+        current._value = value;
       }
     } else {
       // First occurrence or provided existing value
