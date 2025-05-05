@@ -63,8 +63,8 @@ function setNestedValue(
       } else if (typeof current === 'object') {
         // This is an edge case where we have both a value and a nested object
         // with the same key prefix, e.g., "user=john" and "user.name=john"
-        // In this case, we'll keep the object and add a special "_value" property
-        current._value = value;
+        // In this case, we'll keep the object and add a special "__value" property
+        current.__value = value;
       }
     } else {
       // First occurrence or provided existing value
@@ -189,6 +189,8 @@ function processKeyValuePair(
       result[key] = values.length === 1 ? values[0] : values;
     }
   } catch (error) {
+    // Log the error to aid debugging
+    console.error(`Error processing key "${key}":`, error);
     // If there's an error processing this key, store the raw values
     result[key] = values.length === 1 ? values[0] : values;
   }
