@@ -5,7 +5,7 @@ import { q } from '../src/index.js';
 
 const queryString = 'page=2&tags=js&tags=ts';
 console.log('Parsing query string:', queryString);
-console.log('Result:', q.parse(queryString));
+console.log('Result:', q.parseQuery(queryString));
 // Output: { page: '2', tags: ['js', 'ts'] }
 
 // Example 2: Parse a URL with query parameters
@@ -18,5 +18,5 @@ console.log('Result:', q.parseUrl(url));
 // Example 3: Handle URL encoded values
 const encodedQuery = 'search=hello%20world&category=books%20%26%20magazines';
 console.log('\nParsing encoded query:', encodedQuery);
-console.log('Result:', q.parse(encodedQuery));
+console.log('Result:', q.parseQuery(encodedQuery));
 // Output: { search: 'hello world', category: 'books & magazines' }
