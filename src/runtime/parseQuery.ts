@@ -201,11 +201,11 @@ function processKeyValuePair(
  *
  * @example
  * // Returns { page: "2", tags: ["js", "ts"] }
- * parse("page=2&tags=js&tags=ts")
+ * parseQuery("page=2&tags=js&tags=ts")
  *
  * @example
  * // Returns { object: { prop1: "1", prop2: "2" }, tags: ["javascript", "typescript"] }
- * parse("object.prop1=1&object.prop2=2&tags=javascript&tags=typescript")
+ * parseQuery("object.prop1=1&object.prop2=2&tags=javascript&tags=typescript")
  */
 export function parseQuery(queryString: string): ParsedQuery {
   // Normalize the query string
